@@ -4,7 +4,7 @@ type PnLThreshold = {
     mutable Value:  decimal
 }
 
-let pnlThreshold = { Value = 0 }
+let pnlThreshold = { Value = 0M }
 
 type ThresholdUpdateError = 
     | InvalidThresholdValue of string

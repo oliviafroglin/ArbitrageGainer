@@ -20,7 +20,6 @@ type PnLCalculationTests() =
         match calculateProfitLoss transaction with
         | Ok _ -> Assert.Fail("Expected an error for transaction with zero amount.")
         | Error (InvalidTransaction msg) -> Assert.IsTrue(msg.Contains("invalid values"))
-        | Error _ -> Assert.Fail("Unexpected error type.")
 
     [<Test>]
     member this.``Transaction with Extremely High Values`` () =
@@ -38,7 +37,9 @@ type PnLCalculationTests() =
         ]
         match calculateTotalPnL transactions with
         | Ok (Profit totalProfit) -> Assert.AreEqual(150M, totalProfit)
+        | Ok (Loss _) -> Assert.Fail("Did not expect a loss")
         | Error _ -> Assert.Fail("Expected valid aggregation of transactions.")
+
 
     [<Test>]
     member this.``Handle Invalid Transaction in Aggregation`` () =
@@ -49,4 +50,3 @@ type PnLCalculationTests() =
         match calculateTotalPnL transactions with
         | Ok _ -> Assert.Fail("Expected an error due to invalid transaction in the list.")
         | Error (InvalidTransaction msg) -> Assert.IsTrue(msg.Contains("invalid values"))
-        | Error _ -> Assert.Fail("Unexpected error type.")
