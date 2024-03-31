@@ -11,6 +11,7 @@
   <ItemGroup>
     <Compile Include="AnnualizedReturnCalculationTests.fs" />
     <Compile Include="PnLCalculationTests.fs" />
+    <Compile Include="HistoricalDataAnalysisTests.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
 

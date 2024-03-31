@@ -1,3 +1,5 @@
+module HistoricalDataAnalysis
+
 open Newtonsoft.Json
 open System.IO
 
@@ -41,18 +43,19 @@ let identifyArbitrageOpportunities (data: MarketData list): ArbitrageOpportunity
                |> List.collect (fun (_, bucketQuotes) ->
                     // For each bucket, separate quotes by exchange.
                     let exchangeGroups = bucketQuotes |> List.groupBy (fun q -> q.Exchange)
-                    if List.length exchangeGroups > 1 then
+                    match List.length exchangeGroups with
+                    | count when count > 1 ->
                         // Find highest bid and lowest ask for every exchange in this bucket.
                         let highestBid = bucketQuotes |> List.maxBy (fun q -> q.BidPrice)
                         let lowestAsk = bucketQuotes |> List.minBy (fun q -> q.AskPrice)
                         // Compare bid and ask prices between all exchanges and identify arbitrage opportunity.
-                        if highestBid.BidPrice > lowestAsk.AskPrice + 0.01m then
+                        [ highestBid; lowestAsk ]
+                        |> List.forall (fun q -> q.BidPrice > q.AskPrice + 0.01m)
+                        when true ->
                             // Return an opportunity for this pair and bucket.
                             [{ Pair = pair; NumberOfOpportunities = 1 }]
-                        else
-                            []
-                    else
-                        []))
+                        | _ -> []
+                    | _ -> []))
     // Aggregate opportunities by pair and count.
     |> List.groupBy (fun o -> o.Pair)
     |> List.map (fun (pair, opportunities) ->

@@ -1,3 +1,5 @@
+module IdentifyCrossTradedPairs
+
 open System
 open System.Collections.Generic
 

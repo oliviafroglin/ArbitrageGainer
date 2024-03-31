@@ -10,6 +10,7 @@
     <Compile Include="PnLCalculation.fs" />
     <Compile Include="AnnualizedReturnCalculation.fs" />
     <Compile Include="ManagePnLThreshold.fs" />
+    <Compile Include="HistoricalDataAnalysis.fs" />
   </ItemGroup>
 
   <ItemGroup>
