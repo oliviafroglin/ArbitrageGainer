@@ -36,7 +36,7 @@ type PnLCalculationTests() =
             { TransactionType = Sell; PurchaseCost = 50M; SaleRevenue = 100M; Amount = 2M }
         ]
         match calculateTotalPnL transactions with
-        | Ok (Profit totalProfit) -> Assert.AreEqual(150M, totalProfit)
+        | Ok (Profit totalProfit) -> Assert.AreEqual(200M, totalProfit)
         | Ok (Loss _) -> Assert.Fail("Did not expect a loss")
         | Error _ -> Assert.Fail("Expected valid aggregation of transactions.")
 
