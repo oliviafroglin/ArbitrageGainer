@@ -161,19 +161,19 @@
     ]
   },
   "packageFolders": {
-    "/Users/haimingchen/.nuget/packages/": {}
+    "/Users/olivia/.nuget/packages/": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "/Users/haimingchen/Desktop/functional_prog/Arbitrage Project/FunctionalProgramming/ArbitrageGainer/ArbitrageGainer.fsproj",
+      "projectUniqueName": "/Users/olivia/Desktop/FunctionalProgramming/ArbitrageGainer/ArbitrageGainer.fsproj",
       "projectName": "ArbitrageGainer",
-      "projectPath": "/Users/haimingchen/Desktop/functional_prog/Arbitrage Project/FunctionalProgramming/ArbitrageGainer/ArbitrageGainer.fsproj",
-      "packagesPath": "/Users/haimingchen/.nuget/packages/",
-      "outputPath": "/Users/haimingchen/Desktop/functional_prog/Arbitrage Project/FunctionalProgramming/ArbitrageGainer/obj/",
+      "projectPath": "/Users/olivia/Desktop/FunctionalProgramming/ArbitrageGainer/ArbitrageGainer.fsproj",
+      "packagesPath": "/Users/olivia/.nuget/packages/",
+      "outputPath": "/Users/olivia/Desktop/FunctionalProgramming/ArbitrageGainer/obj/",
       "projectStyle": "PackageReference",
       "configFilePaths": [
-        "/Users/haimingchen/.nuget/NuGet/NuGet.Config"
+        "/Users/olivia/.nuget/NuGet/NuGet.Config"
       ],
       "originalTargetFrameworks": [
         "net6.0"

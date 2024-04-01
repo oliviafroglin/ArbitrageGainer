@@ -1,11 +1,11 @@
 {
   "version": 2,
-  "dgSpecHash": "SjWVLzQbZGPMLMl4lMITU2lIC62uXVUBQtRblPDepRhyUNxgZeZo0XWUhiCLOkrJN4C6JGIjIfyc73Zjdskdkw==",
+  "dgSpecHash": "8eNwf+pnVMSnKJYBCur1znspwyziPrxtp3mfDHaV2nmg+zgR8n+fqcv7XXWDF5F+MXe1kBaP0nM6K01HkyKjYg==",
   "success": true,
-  "projectFilePath": "/Users/haimingchen/Desktop/functional_prog/Arbitrage Project/FunctionalProgramming/ArbitrageGainer/ArbitrageGainer.fsproj",
+  "projectFilePath": "/Users/olivia/Desktop/FunctionalProgramming/ArbitrageGainer/ArbitrageGainer.fsproj",
   "expectedPackageFiles": [
-    "/Users/haimingchen/.nuget/packages/fsharp.core/6.0.7/fsharp.core.6.0.7.nupkg.sha512",
-    "/Users/haimingchen/.nuget/packages/newtonsoft.json/13.0.3/newtonsoft.json.13.0.3.nupkg.sha512"
+    "/Users/olivia/.nuget/packages/fsharp.core/6.0.7/fsharp.core.6.0.7.nupkg.sha512",
+    "/Users/olivia/.nuget/packages/newtonsoft.json/13.0.3/newtonsoft.json.13.0.3.nupkg.sha512"
   ],
   "logs": []
 }

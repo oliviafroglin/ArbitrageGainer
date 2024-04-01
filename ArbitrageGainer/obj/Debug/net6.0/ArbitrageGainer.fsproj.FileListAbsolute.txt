@@ -26,3 +26,7 @@
 /Users/haimingchen/Desktop/functional_prog/Arbitrage Project/FunctionalProgramming/ArbitrageGainer/obj/Debug/net6.0/ArbitrageGainer.dll
 /Users/haimingchen/Desktop/functional_prog/Arbitrage Project/FunctionalProgramming/ArbitrageGainer/obj/Debug/net6.0/ArbitrageGainer.pdb
 /Users/haimingchen/Desktop/functional_prog/Arbitrage Project/FunctionalProgramming/ArbitrageGainer/obj/Debug/net6.0/ArbitrageGainer.genruntimeconfig.cache
+/Users/olivia/Desktop/FunctionalProgramming/ArbitrageGainer/obj/Debug/net6.0/ArbitrageGainer.AssemblyInfoInputs.cache
+/Users/olivia/Desktop/FunctionalProgramming/ArbitrageGainer/obj/Debug/net6.0/ArbitrageGainer.AssemblyInfo.fs
+/Users/olivia/Desktop/FunctionalProgramming/ArbitrageGainer/obj/Debug/net6.0/ArbitrageGainer.dll
+/Users/olivia/Desktop/FunctionalProgramming/ArbitrageGainer/obj/Debug/net6.0/ArbitrageGainer.pdb
