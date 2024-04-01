@@ -11,6 +11,8 @@
     <Compile Include="AnnualizedReturnCalculation.fs" />
     <Compile Include="ManagePnLThreshold.fs" />
     <Compile Include="HistoricalDataAnalysis.fs" />
+    <Compile Include="MarketDataRetrieval.fs" />
+    <Compile Include="ArbitrageOpportunityIdentifier.fs" />
   </ItemGroup>
 
   <ItemGroup>
