@@ -1,4 +1,6 @@
-﻿type Exchange = Kraken | Bitstamp | Bitfinex
+﻿module OrderExecution
+
+type Exchange = Kraken | Bitstamp | Bitfinex
 type CryptoCurrencyPair = string
 
 type UserDefinedParameters = {
@@ -88,7 +90,7 @@ let rec executeTransaction opportunity userParams currentProfit cumulativeTradin
         let totalProfit = profitPerUnit * decimal(orderQuantity)
         let isProfitable = totalProfit >= userParams.MinimalTransactionProfit && transactionValue <= userParams.MaximalTransactionValue
 
-        match (isSpreadProfitable, isProfitable, orderQuantity > 0, potentialNewCumulativeTradingValue <= userParams.MaximalTradingValue) with
+        match (isSpreadProfitable, isProfitable, orderQuantity > 0m, potentialNewCumulativeTradingValue <= userParams.MaximalTradingValue) with
         | (true, true, true, true) ->
             let (buySuccess, boughtAmount) = simulateBuyTransaction opportunity orderQuantity buyPrice
             match buySuccess with
