@@ -1,3 +1,10 @@
+#### 1. Historical spread calculation algorithm
+Path: `./ArbitrageGainer/HistoricalDataAnalysis.fs` \
+Test: `./ArbitrageGainer.Tests/HistoricalDataAnalysisTests.fs`
+
+#### 2. Identify Cross Traded Pairs
+Path: `./ArbitrageGainer/IdentifyCrossTradedPairs.fs`
+
 #### 6. P & L Calculation
 Path: `./ArbitrageGainer/PnLCalculation.fs` \
 Test: `./ArbitrageGainer.Tests/PnLCalculationTests.fs`
