@@ -12,6 +12,8 @@
     <Compile Include="ManagePnLThreshold.fs" />
     <Compile Include="HistoricalDataAnalysis.fs" />
     <Compile Include="MarketDataRetrieval.fs" />
+    <Compile Include="OrderExecution.fs" />
+    <Compile Include="IdentifyCrossTradedPairs.fs" />
     <Compile Include="ArbitrageOpportunityIdentifier.fs" />
   </ItemGroup>
 
