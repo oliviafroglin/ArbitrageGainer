@@ -49,9 +49,8 @@ let identifyArbitrageOpportunities (data: MarketData list): ArbitrageOpportunity
                         let highestBid = bucketQuotes |> List.maxBy (fun q -> q.BidPrice)
                         let lowestAsk = bucketQuotes |> List.minBy (fun q -> q.AskPrice)
                         // Compare bid and ask prices between all exchanges and identify arbitrage opportunity.
-                        [ highestBid; lowestAsk ]
-                        |> List.forall (fun q -> q.BidPrice > q.AskPrice + 0.01m)
-                        when true ->
+                        match highestBid.BidPrice, lowestAsk.AskPrice with
+                        | bid, ask when bid > ask + 0.01m ->
                             // Return an opportunity for this pair and bucket.
                             [{ Pair = pair; NumberOfOpportunities = 1 }]
                         | _ -> []
