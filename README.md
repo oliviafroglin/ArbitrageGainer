@@ -1,3 +1,5 @@
+## Link to repo: https://github.com/oliviafroglin/FunctionalProgramming/tree/main
+
 #### 1. Historical spread calculation algorithm
 
 Path: `./ArbitrageGainer/HistoricalDataAnalysis.fs` \
