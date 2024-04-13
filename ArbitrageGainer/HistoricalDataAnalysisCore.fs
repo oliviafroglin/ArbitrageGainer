@@ -1,6 +1,5 @@
-module HistoricalDataAnalysis
+module HistoricalDataAnalysisCore
 
-open System.IO
 open Newtonsoft.Json
 
 [<CLIMutable>]
@@ -20,11 +19,6 @@ type MarketData = {
     [<JsonProperty("x")>]
     Exchange: int
 }
-
-
-let readMarketDataFromFile (filePath: string): MarketData list =
-    let json = File.ReadAllText(filePath)
-    JsonConvert.DeserializeObject<MarketData list>(json)
 
 let mapPhaseWithoutGroupByPair (quotes: MarketData list) =
     let earliestTimestamp = quotes |> List.minBy (fun q -> q.Timestamp) |> fun q -> q.Timestamp
@@ -50,22 +44,3 @@ let reducePhaseWithoutGroupByPair (mappedData: (string * int) list) =
     mappedData
     |> List.groupBy fst
     |> List.map (fun (pair, instances) -> (pair, List.sumBy snd instances))
-
-let identifyArbitrageOpportunities (data: MarketData list) =
-    data
-    |> mapPhaseWithoutGroupByPair
-    |> reducePhaseWithoutGroupByPair
-    |> List.sortByDescending snd
-
-let printArbitrageOpportunities (opportunities: (string * int) list) =
-    printfn "Arbitrage Opportunities:"
-    opportunities |> List.iter (fun (pair, numOpportunities) ->
-        printfn "Pair: %s, Number of Opportunities: %d" pair numOpportunities)
-
-// [<EntryPoint>]
-// let main argv =
-let filePath = "../historicalData.txt"
-let marketData = readMarketDataFromFile filePath
-let opportunities = identifyArbitrageOpportunities marketData
-printArbitrageOpportunities opportunities
-0
