@@ -7,10 +7,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Include="PnLCalculation.fs" />
-    <Compile Include="PnLCalculationCore.fs" />
-    <Compile Include="PnLCalculationService.fs" />
-    <Compile Include="PnLCalculationInfra.fs" />
     <Compile Include="AnnualizedReturnCalculation.fs" />
     <Compile Include="AnnualizedReturnCalculationCore.fs" />
     <Compile Include="AnnualizedReturnCalculationInfra.fs" />
