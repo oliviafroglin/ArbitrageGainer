@@ -7,7 +7,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Include="PnLCalculation.fs" />
     <Compile Include="AnnualizedReturnCalculation.fs" />
     <Compile Include="ManagePnLThreshold.fs" />
     <Compile Include="HistoricalDataAnalysisCore.fs" />
@@ -24,6 +23,7 @@
   <ItemGroup>
     <PackageReference Include="FSharp.Data" Version="6.4.0" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+    <PackageReference Include="Suave" Version="2.6.2" />
     <PackageReference Include="System.Net.Http.Json" Version="8.0.0" />
   </ItemGroup>
 

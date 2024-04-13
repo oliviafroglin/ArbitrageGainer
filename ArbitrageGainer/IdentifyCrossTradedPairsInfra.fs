@@ -16,6 +16,7 @@ let fetchCurrencyPairsFromBitfinex () =
     async {
         let url = "https://api-pub.bitfinex.com/v2/conf/pub:list:pair:exchange"
         let! response = httpClient.GetAsync(url) |> Async.AwaitTask
+        printfn "Response: %A" response
         let! content = response.Content.ReadAsStringAsync() |> Async.AwaitTask
         let data = JsonValue.Parse(content)
         return data.[0].AsArray() |> Array.map (fun x -> 
@@ -35,6 +36,7 @@ let fetchCurrencyPairsFromBitstamp () =
     async {
         let url = "https://www.bitstamp.net/api/v2/ticker/"
         let! response = httpClient.GetAsync(url) |> Async.AwaitTask
+        printfn "Response: %A" response
         let! content = response.Content.ReadAsStringAsync() |> Async.AwaitTask
         let data = JsonValue.Parse(content)
         return data.AsArray() |> Array.map (fun x -> x.["pair"].AsString().Replace("/", ":").Split(':')) |> Array.choose (fun arr -> 
@@ -47,6 +49,7 @@ let fetchCurrencyPairsFromKraken () =
     async {
         let url = "https://api.kraken.com/0/public/AssetPairs"
         let! response = httpClient.GetAsync(url) |> Async.AwaitTask
+        printfn "Response: %A" response
         let! content = response.Content.ReadAsStringAsync() |> Async.AwaitTask
         let data = JsonValue.Parse(content)
         return data.["result"].Properties() |> Array.map (fun (_, v) -> (v.["base"].AsString(), v.["quote"].AsString()))
@@ -82,13 +85,24 @@ let identifyCrossTradedPairs () =
         saveSetToFile "./krakenPairs.txt" krakenSet1
 
         let crossTradedPairs = IdentifyCrossTradedPairsService(bitfinexSet1, bitstampSet1, krakenSet1)
+
+        saveSetToFile "./crossTradedPairs.txt" crossTradedPairs
+
+        printfn "crossTradedPairs: %A" crossTradedPairs
         return crossTradedPairs
     }
 
-let printCrossTradedPairs () =
-    async {
-        let crossTradedPairs = identifyCrossTradedPairs () |> Async.RunSynchronously
-        crossTradedPairs |> Set.iter (fun (pair1, pair2) -> printfn "%s-%s" pair1 pair2)
-    }
+// let printCrossTradedPairs () =
+//     async {
+//         let crossTradedPairs = identifyCrossTradedPairs () |> Async.RunSynchronously
+//         crossTradedPairs |> Set.iter (fun (pair1, pair2) -> printfn "%s-%s" pair1 pair2)
+//     }
 
-printCrossTradedPairs () |> Async.RunSynchronously
+// printCrossTradedPairs () |> Async.RunSynchronously
+// identifyCrossTradedPairs () |> Async.RunSynchronously
+// Execute the async function and print the results
+[<EntryPoint>]
+let main argv =
+    let task = identifyCrossTradedPairs () |> Async.StartAsTask
+    task.Result |> Set.iter (fun (pair1, pair2) -> printfn "%s-%s" pair1 pair2)
+    0 // return an integer exit code
