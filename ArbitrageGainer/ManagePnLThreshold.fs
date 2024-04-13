@@ -1,26 +1,32 @@
 module PnLThresholdManagement
 
-type PnLThreshold = {
-    Value: decimal
-}
+open System
 
-type ThresholdUpdateError = 
-    | InvalidThresholdValue of string
+type ThresholdMessage =
+    | SetThreshold of decimal * AsyncReplyChannel<Result<decimal, string>>
+    | GetThreshold of AsyncReplyChannel<decimal>
 
-let validateThreshold (newThreshold: decimal) =
-    match newThreshold >= 0M with
-    | true -> Ok newThreshold
-    | false -> Error (InvalidThresholdValue "Threshold must be greater than or equal to 0.")
+type PnLThresholdAgent() =
+    let agent = MailboxProcessor.Start(fun inbox ->
+        let rec messageLoop currentThreshold = async {
+            let! msg = inbox.Receive()
+            match msg with
+            | SetThreshold(newThreshold, reply) ->
+                if newThreshold >= 0M then
+                    reply.Reply(Ok newThreshold)
+                    return! messageLoop newThreshold
+                else
+                    reply.Reply(Error "Threshold must be greater than or equal to 0.")
+                    return! messageLoop currentThreshold
 
-let updateThreshold (currentThreshold: PnLThreshold) (newThreshold: decimal) =
-    match validateThreshold newThreshold with
-    | Ok validThreshold -> 
-        let updatedThreshold = { Value = validThreshold }
-        match validThreshold with
-        | _ when validThreshold > 0M -> printfn "New P&L Threshold set to: %M" validThreshold
-        | _ -> printfn "Threshold canceled. The system will continuously perform transactions."
-        Ok updatedThreshold
-    | Error err -> 
-        printfn "Error: %A" err
-        Error err
+            | GetThreshold(reply) ->
+                reply.Reply(currentThreshold)
+                return! messageLoop currentThreshold
+        }
+        messageLoop 0M) // Initial threshold
 
+    member this.SetThreshold(threshold) =
+        agent.PostAndAsyncReply(fun reply -> SetThreshold(threshold, reply))
+
+    member this.GetThreshold() =
+        agent.PostAndAsyncReply(fun reply -> GetThreshold(reply))
