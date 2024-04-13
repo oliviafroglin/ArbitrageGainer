@@ -1,12 +1,13 @@
-module identifyCrossTradedPairs
+module IdentifyCrossTradedPairsInfra
+
+open IdentifyCrossTradedPairsCore
+open IdentifyCrossTradedPairsService
 
 open System
 open System.Net.Http
 open FSharp.Data
 open System.Threading.Tasks
 open System.IO
-
-type CurrencyPair = string * string
 
 let httpClient = new HttpClient()
 
@@ -58,53 +59,6 @@ let saveSetToFile filePath (currencyPairs : Set<CurrencyPair>) =
         |> Set.fold (fun acc pair -> acc + pair + "\n") ""
     File.WriteAllText(filePath, content)
 
-let normalizeCurrency currency =
-    match currency with
-    | "UST" | "USDT" | "USDC" -> "USD"
-    | "EURT" -> "EUR"
-    | "CNHT" | "MXNT" | "TESTUSD" | "TESTUSDT" -> ""
-    | curr when curr.StartsWith("TEST") -> ""
-    | _ -> currency
-
-let cleanPair (base_, quote) =
-    let normalizedBase = normalizeCurrency base_
-    let normalizedQuote = normalizeCurrency quote
-    match normalizedBase, normalizedQuote with
-    | "", _ -> None
-    | _, "" -> None
-    | _ -> Some (normalizedBase, normalizedQuote)
-
-let processCurrencyPairs pairs =
-    pairs
-    |> Seq.map cleanPair
-    |> Seq.choose id
-    |> Set.ofSeq
-
-let normalizeKrakenCurrency currency =
-    match currency with
-    | "UST" | "USDT" | "USDC" -> "USD"
-    | "EURT" -> "EUR"
-    | curr when (curr.StartsWith("X") || curr.StartsWith("Z") || curr.StartsWith("A")) && curr.Length > 3 -> curr.[1..]
-    | _ -> currency
-
-let cleanKrakenPair (base_, quote) =
-    let normalizedBase = normalizeKrakenCurrency base_
-    let normalizedQuote = normalizeKrakenCurrency quote
-    match normalizedBase, normalizedQuote with
-    | "", _ -> None
-    | _, "" -> None
-    | _ -> Some (normalizedBase, normalizedQuote)
-
-let processKrakenCurrencyPairs pairs =
-    pairs
-    |> Seq.map cleanKrakenPair
-    |> Seq.choose id 
-    |> Set.ofSeq
-
-let IdentifyCrossTradedPairsService (exchange1, exchange2, exchange3) =
-    let crossTradedPairs = exchange1 |> Set.intersect exchange2 |> Set.intersect exchange3
-    crossTradedPairs
-
 let identifyCrossTradedPairs () =
     async {
         let! bitfinexPairs = fetchCurrencyPairsFromBitfinex ()
@@ -130,13 +84,6 @@ let identifyCrossTradedPairs () =
         let crossTradedPairs = IdentifyCrossTradedPairsService(bitfinexSet1, bitstampSet1, krakenSet1)
         return crossTradedPairs
     }
-
-// Execute the async function and print the results
-// [<EntryPoint>]
-// let main argv =
-//     let task = identifyCrossTradedPairs () |> Async.StartAsTask
-//     task.Result |> Set.iter (fun (pair1, pair2) -> printfn "%s-%s" pair1 pair2)
-//     0 // return an integer exit code
 
 let printCrossTradedPairs () =
     async {
