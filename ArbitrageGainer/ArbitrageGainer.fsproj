@@ -8,7 +8,12 @@
 
   <ItemGroup>
     <Compile Include="AnnualizedReturnCalculation.fs" />
+    <Compile Include="AnnualizedReturnCalculationCore.fs" />
+    <Compile Include="AnnualizedReturnCalculationInfra.fs" />
     <Compile Include="ManagePnLThreshold.fs" />
+    <Compile Include="ManagePnLThresholdCore.fs" />
+    <Compile Include="ManagePnLThresholdService.fs" />
+    <Compile Include="ManagePnLThresholdInfra.fs" />
     <Compile Include="HistoricalDataAnalysisCore.fs" />
     <Compile Include="HistoricalDataAnalysisService.fs" />
     <Compile Include="HistoricalDataAnalysisInfra.fs" />
@@ -18,6 +23,7 @@
     <Compile Include="IdentifyCrossTradedPairsCore.fs" />
     <Compile Include="IdentifyCrossTradedPairsService.fs" />
     <Compile Include="IdentifyCrossTradedPairsInfra.fs" />
+    <Compile Include="mainWenxi.fs" />
   </ItemGroup>
 
   <ItemGroup>
