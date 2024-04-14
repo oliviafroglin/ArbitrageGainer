@@ -1,12 +1,12 @@
 module ManagePnLThresholdCore
 
-type ThresholdMessage =
-    | SetThreshold of decimal
-    | GetThreshold
-
 type ThresholdResult =
     | Ok of decimal
     | Error of string
+
+type ThresholdMessage =
+    | SetThreshold of decimal * AsyncReplyChannel<ThresholdResult>
+    | GetThreshold of AsyncReplyChannel<ThresholdResult>
 
 type PnLThreshold = {
     Value: decimal
@@ -14,6 +14,4 @@ type PnLThreshold = {
 
 type ThresholdValidation =
     | Valid of decimal
-    | Invalid
-
-
+    | Invalid of string  // Also added 'of string' to carry specific error messages

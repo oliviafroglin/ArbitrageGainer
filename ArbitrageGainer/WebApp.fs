@@ -8,6 +8,8 @@ open ArbitrageInfra
 open Newtonsoft.Json
 open HistoricalDataAnalysisInfra
 open IdentifyCrossTradedPairsInfra
+open ManagePnLThresholdInfra
+open PnLCalculationInfra
 
 let app : WebPart =
     choose [
@@ -15,6 +17,7 @@ let app : WebPart =
             path "/update-config" >=> updateConfig
             path "/start-trading" >=> startTrading
             path "/stop-trading" >=> stopTrading
+            path "/pnl/threshold" >=> updateThresholdHandler
         ]
         GET >=> choose [
             path "/get-historical-data" >=> (fun (ctx: HttpContext) ->
@@ -28,6 +31,8 @@ let app : WebPart =
                     let json = JsonConvert.SerializeObject(task.Result)
                     return! Successful.OK json ctx
                 })
+            path "/pnl/historical" >=> pnlHandler
+            // path "/annualized-return" >=> annualizedReturnHandler
         ]
     ]
 [<EntryPoint>]
