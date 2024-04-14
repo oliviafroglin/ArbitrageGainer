@@ -1,18 +1,26 @@
-module AnnualizedReturnCalculation
+module AnnualizedReturnCalculationCore
 
 open System
+open PnLCalculationCore
 
-type CashFlowError = 
-    | InvalidDuration of string
-    | InvalidInitialInvestment of string
+type InvestmentDetails = {
+    StartDate: DateTime
+    InitialInvestment: decimal
+    TotalReturn: decimal
+    DurationYears: float
+}
 
-let calculateAnnualizedReturn (initialInvestment: double) (totalReturn: double) (startTime: DateTime) =
-    match initialInvestment > 0.0, DateTime.UtcNow > startTime with
-    | true, true ->
-        let duration = DateTime.UtcNow - startTime
-        let yearsElapsed = duration.TotalDays / 365.25
-        let annualizedReturn = Math.Pow((totalReturn / initialInvestment + 1.0), 1.0 / yearsElapsed) - 1.0
-        Ok annualizedReturn
-    | false, _ -> Error (InvalidInitialInvestment "Initial investment must be greater than zero.")
-    | _, false -> Error (InvalidDuration "Start time must be in the past.")
+let calculateInitialInvestment (transactions: CompletedTransaction list) =
+    transactions
+    |> List.fold (fun acc t -> 
+        match t.TransactionType with
+        | Buy -> acc - (t.BuyPrice * t.Amount)
+        | Sell -> acc + (t.SellPrice * t.Amount)
+        ) 0m
+
+let calculateAnnualizedReturn (investment: InvestmentDetails) =
+    let ratio = investment.TotalReturn / investment.InitialInvestment
+    let exponent = 1.0 / investment.DurationYears
+    Math.Pow(Convert.ToDouble(ratio), exponent) - 1.0
+
 

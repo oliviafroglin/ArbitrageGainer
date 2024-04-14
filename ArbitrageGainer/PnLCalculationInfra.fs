@@ -20,8 +20,6 @@ open FSharp.Data.Npgsql
 // type SqlDb = NpgsqlConnection<connectionString>
 // let db = SqlDb.GetDataContext()
 
-
-
 let fetchTransactions startDate endDate =
     // fake data in this format
     // type CompletedTransaction = {TransactionType: TransactionType PurchasePrice: decimal SalePrice: decimal Amount: decimal TransactionDate: DateTime}
