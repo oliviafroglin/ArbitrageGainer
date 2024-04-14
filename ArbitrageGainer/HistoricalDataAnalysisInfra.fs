@@ -6,10 +6,10 @@ open MySql.Data.MySqlClient
 open HistoricalDataAnalysisCore
 open HistoricalDataAnalysisService
 
-let connectionString = "Server=34.42.239.81;Database=orders;Uid=sqlserver;Pwd=-*lUp54$JMRku5Ay;default command timeout=60"
+let connectionString = "Server=cmu-fp.mysql.database.azure.com;Database=team_database_schema;Uid=sqlserver;Pwd=-*lUp54$JMRku5Ay;SslMode=Required;"
 
 let initializeDatabase () =
-    // let connection = new MySqlConnection(connectionString)
+    let connection = new MySqlConnection(connectionString)
     let commandText = """
         DROP TABLE IF EXISTS historical_spread;
         CREATE TABLE historical_spread (
@@ -18,15 +18,11 @@ let initializeDatabase () =
         );
     """
     try
-        printfn "Connecting to MySQL..."
-        let connection = new MySqlConnection(connectionString)
-        printfn "sassss: %A" connection.State
         connection.Open()
-    with
-        | ex -> printfn "Error: %A" ex
-        | _ -> ()
-    // printfn "Closing connection to MySQL..."
-    // connection.Close()
+        let command = new MySqlCommand(commandText, connection)
+        command.ExecuteNonQuery() |> ignore
+    finally
+        connection.Close()
 
 let saveOpportunitiesToDatabase (opportunities: ArbitrageOpportunity list) =
     let connection = new MySqlConnection(connectionString)
@@ -59,9 +55,9 @@ let getHistoricalSpread () =
     let marketData = readMarketDataFromFile filePath
     let opportunities = identifyArbitrageOpportunities marketData
     printArbitrageOpportunities opportunities
-    // initializeDatabase ()
-    // saveOpportunitiesToDatabase opportunities
+    initializeDatabase ()
+    saveOpportunitiesToDatabase opportunities
     writeOpportunitiesToFile("./historicalspread.txt", opportunities)
     opportunities
 
-// printfn "getHistoricalSpread: %A" (getHistoricalSpread())
+printfn "from infrastructure: getHistoricalSpread: %A" (getHistoricalSpread())
