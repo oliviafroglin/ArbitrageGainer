@@ -10,7 +10,7 @@ open System
 open PnLCalculationService
 open MySql.Data.MySqlClient
 
-let connectionString = "Server=cmu-fp.mysql.database.azure.com;Uid=sqlserver;Pwd=-*lUp54$JMRku5Ay;SslMode=Required;"
+let connectionString = "Server=cmu-fp.mysql.database.azure.com;Database=team_database_schema;Uid=sqlserver;Pwd=-*lUp54$JMRku5Ay;SslMode=Required;"
 
 let fetchTransactionsForDay (date: DateTime) : list<CompletedTransaction>=
     let startOfDay = date.Date
