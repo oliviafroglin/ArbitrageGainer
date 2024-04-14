@@ -3,7 +3,7 @@ module PnLCalculationService
 open PnLCalculationCore
 
 let calculateTotalPnL transactions =
-    transactions |> List.map calculateProfitLoss |> List.sumBy (function Profit p -> p | Loss l -> -l)
+    transactions |> List.map calculateProfitLoss |> List.sumBy (function Profit p -> p | Loss l -> l)
 
 let calculatePnL opportunity =
     calculateProfitLossForOpportunity opportunity
