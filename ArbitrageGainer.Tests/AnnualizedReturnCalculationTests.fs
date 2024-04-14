@@ -17,7 +17,7 @@ type AnnualizedReturnTests() =
     [<Test>]
     member this.``Calculate Initial Investment with Only Buys``() =
         let transactions = [
-            { TransactionType = Buy; BuyPrice = 200m; SellPrice = 0m; Amount = 2m; TransactionDate = DateTime(2020, 1, 1) }
+            { TransactionType = Buy; Price = 200m; Amount = 2m; TransactionDate = DateTime(2020, 1, 1) }
         ]
         let result = calculateInitialInvestment transactions
         Assert.AreEqual(-400m, result, "Expected initial investment to be negative due to only buys.")
@@ -25,7 +25,7 @@ type AnnualizedReturnTests() =
     [<Test>]
     member this.``Calculate Initial Investment with Only Sells``() =
         let transactions = [
-            { TransactionType = Sell; BuyPrice = 0m; SellPrice = 300m; Amount = 3m; TransactionDate = DateTime(2020, 1, 1) }
+            { TransactionType = Sell; Price = 300m; Amount = 3m; TransactionDate = DateTime(2020, 1, 1) }
         ]
         let result = calculateInitialInvestment transactions
         Assert.AreEqual(900m, result, "Expected initial investment to be positive due to only sells.")

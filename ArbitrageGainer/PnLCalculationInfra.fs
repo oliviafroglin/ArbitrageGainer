@@ -11,22 +11,42 @@ open Newtonsoft.Json
 open System.Globalization
 open PnLCalculationCore
 open PnLCalculationService
-// open MySql.Data.MySqlClient
-// open Microsoft.Data.SqlClient
-// open FSharp.Data.SqlClient
-open FSharp.Data.Npgsql
+open MySql.Data.MySqlClient
 
-// let connectionString = "Host=34.42.239.81;Database=orders;Username=sqlserver;Password=-*lUp54$JMRku5Ay;Trusted_Connection=True;"
-// type SqlDb = NpgsqlConnection<connectionString>
-// let db = SqlDb.GetDataContext()
+let connectionString = "Server=cmu-fp.mysql.database.azure.com;Uid=sqlserver;Pwd=-*lUp54$JMRku5Ay;SslMode=Required;"
 
 let fetchTransactions startDate endDate =
-    // fake data in this format
-    // type CompletedTransaction = {TransactionType: TransactionType PurchasePrice: decimal SalePrice: decimal Amount: decimal TransactionDate: DateTime}
-    [
-        { TransactionType = TransactionType.Buy; BuyPrice = 100.0M; SellPrice = 0.0M; Amount = 100.0M; TransactionDate = DateTime.Parse("2021-01-01") }
-        { TransactionType = TransactionType.Sell; BuyPrice = 0.0M; SellPrice = 200.0M; Amount = 200.0M; TransactionDate = DateTime.Parse("2021-01-02") }
-    ]
+    use connection = new MySqlConnection(connectionString)
+    connection.Open()
+
+    let commandText = sprintf """
+        SELECT TransactionType, Price, Amount, TransactionDate
+        FROM transactions
+        WHERE TransactionDate >= @startDate AND TransactionDate <= @endDate;
+        """
+    
+    use cmd = new MySqlCommand(commandText, connection)
+    
+    cmd.Parameters.AddWithValue("@startDate", startDate)
+    cmd.Parameters.AddWithValue("@endDate", endDate)
+
+    use reader = cmd.ExecuteReader()
+    
+    let transactions = 
+        [ while reader.Read() do
+            let transactionType = 
+                match reader.GetString("TransactionType") with
+                | "Buy" -> Buy
+                | "Sell" -> Sell
+                | _ -> raise (InvalidOperationException("Invalid transaction type"))
+            
+            let price = reader.GetDecimal("Price")
+            let amount = reader.GetDecimal("Amount")
+            let transactionDate = reader.GetDateTime("TransactionDate")
+            
+            yield { TransactionType = transactionType; Price = price; Amount = amount; TransactionDate = transactionDate }
+        ]
+    transactions
 
 let parseDate (dateStr: string) =
     match DateTime.TryParseExact(dateStr, "yyyy-MM-dd", CultureInfo.InvariantCulture, DateTimeStyles.None) with

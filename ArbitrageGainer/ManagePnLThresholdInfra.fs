@@ -1,8 +1,6 @@
 module ManagePnLThresholdInfra
 
 open Suave
-open Suave.Filters
-open Suave.Operators
 open Suave.Successful
 open Suave.RequestErrors
 open ManagePnLThresholdService

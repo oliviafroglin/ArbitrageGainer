@@ -14,8 +14,8 @@ let calculateInitialInvestment (transactions: CompletedTransaction list) =
     transactions
     |> List.fold (fun acc t -> 
         match t.TransactionType with
-        | Buy -> acc - (t.BuyPrice * t.Amount)
-        | Sell -> acc + (t.SellPrice * t.Amount)
+        | Buy -> acc - (t.Price * t.Amount)
+        | Sell -> acc + (t.Price * t.Amount)
         ) 0m
 
 let calculateAnnualizedReturn (investment: InvestmentDetails) =

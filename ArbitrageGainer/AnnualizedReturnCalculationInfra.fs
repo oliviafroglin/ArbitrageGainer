@@ -2,27 +2,52 @@ module AnnualizedReturnCalculationInfra
 
 open PnLCalculationCore
 open Suave
-open Suave.Filters
-open Suave.Operators
 open Suave.Successful
 open Suave.RequestErrors
 open AnnualizedReturnCalculationCore
 open System.Globalization
 open System
 open PnLCalculationService
-open PnLCalculationCore
+open MySql.Data.MySqlClient
 
-let connectionString = "Host=34.42.239.81;Database=orders;Username=sqlserver;Password=-*lUp54$JMRku5Ay;Trusted_Connection=True;"
+let connectionString = "Server=cmu-fp.mysql.database.azure.com;Uid=sqlserver;Pwd=-*lUp54$JMRku5Ay;SslMode=Required;"
 
-let fetchTransactionsForDay (connectionString: string) (date: DateTime) : list<CompletedTransaction>=
-    // Placeholder: implement actual database fetching logic here
-    // This should return a list of CompletedTransaction
-    // Example SQL: SELECT * FROM Transactions WHERE TransactionDate BETWEEN @startOfDay AND @endOfDay
-    [
-        { TransactionType = TransactionType.Buy; BuyPrice = 100.0M; SellPrice = 0.0M; Amount = 100.0M; TransactionDate = DateTime.Parse("2021-01-01") }
-        { TransactionType = TransactionType.Sell; BuyPrice = 0.0M; SellPrice = 200.0M; Amount = 200.0M; TransactionDate = DateTime.Parse("2021-01-02") }
-    ]
+let fetchTransactionsForDay (date: DateTime) : list<CompletedTransaction>=
+    let startOfDay = date.Date
+    let endOfDay = date.Date.AddDays(1.0).AddTicks(-1L)
 
+    use connection = new MySqlConnection(connectionString)
+    connection.Open()
+
+    let commandText = """
+        SELECT TransactionType, Price, Amount, TransactionDate
+        FROM transactions
+        WHERE TransactionDate BETWEEN @startOfDay AND @endOfDay;
+        """
+    
+    use cmd = new MySqlCommand(commandText, connection)
+    
+    cmd.Parameters.AddWithValue("@startOfDay", startOfDay)
+    cmd.Parameters.AddWithValue("@endOfDay", endOfDay)
+
+    use reader = cmd.ExecuteReader()
+    
+    let transactions = 
+        [ while reader.Read() do
+            let transactionType = 
+                match reader.GetString("TransactionType") with
+                | "Buy" -> Buy
+                | "Sell" -> Sell
+                | _ -> raise (InvalidOperationException("Invalid transaction type"))
+            
+            let price = reader.GetDecimal("Price")
+            let amount = reader.GetDecimal("Amount")
+            let transactionDate = reader.GetDateTime("TransactionDate")
+            
+            yield { TransactionType = transactionType; Price = price; Amount = amount; TransactionDate = transactionDate }
+        ]
+
+    transactions
 
 let annualizedReturnHandler (ctx: HttpContext) : Async<HttpContext option> =
     async {
@@ -35,7 +60,7 @@ let annualizedReturnHandler (ctx: HttpContext) : Async<HttpContext option> =
 
             match parseDate startDateStr with
             | Some startDate ->
-                let transactions = fetchTransactionsForDay connectionString startDate  // Correctly uses DateTime
+                let transactions = fetchTransactionsForDay startDate  // Correctly uses DateTime
                 let initialInvestment = calculateInitialInvestment transactions
                 let endDate = DateTime.Now
                 let dateRange = { StartDate = startDate; EndDate = endDate }
