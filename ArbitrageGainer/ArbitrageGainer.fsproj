@@ -7,6 +7,9 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Include="PnLCalculationCore.fs" />
+    <Compile Include="PnLCalculationService.fs" />
+    <Compile Include="PnLCalculationInfra.fs" />
     <Compile Include="AnnualizedReturnCalculation.fs" />
     <Compile Include="AnnualizedReturnCalculationCore.fs" />
     <Compile Include="AnnualizedReturnCalculationInfra.fs" />
@@ -28,6 +31,8 @@
 
   <ItemGroup>
     <PackageReference Include="FSharp.Data" Version="6.4.0" />
+    <PackageReference Include="FSharp.Data.Npgsql" Version="2.1.0" />
+    <PackageReference Include="FSharp.Data.SqlClient" Version="2.1.2" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageReference Include="Suave" Version="2.6.2" />
     <PackageReference Include="System.Net.Http.Json" Version="8.0.0" />

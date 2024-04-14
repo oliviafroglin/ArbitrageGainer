@@ -4,7 +4,7 @@ open Suave
 open Suave.Filters
 open Suave.Operators
 open Suave.Successful
-open AnnualizedReturnCalculation
+open AnnualizedReturnCalculationCore
 open System.Globalization
 
 let annualizedReturnHandler =
@@ -21,3 +21,4 @@ let annualizedReturnHandler =
             | _ -> return! BAD_REQUEST "Invalid JSON data."
         })
 
+let app = choose [ annualizedReturnHandler ]
