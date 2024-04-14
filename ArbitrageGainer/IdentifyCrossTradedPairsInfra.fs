@@ -11,7 +11,6 @@ open System.IO
 
 let httpClient = new HttpClient()
 
-// Asynchronous function to fetch data from Bitfinex
 let fetchCurrencyPairsFromBitfinex () =
     async {
         let url = "https://api-pub.bitfinex.com/v2/conf/pub:list:pair:exchange"
@@ -76,14 +75,6 @@ let identifyCrossTradedPairs () =
         let bitstampSet1 = processCurrencyPairs bitstampSet
         let krakenSet1 = processKrakenCurrencyPairs krakenSet
 
-        printfn "bitfinexSet1: %A" bitfinexSet1
-        printfn "bitstampSet1: %A" bitstampSet1
-        printfn "krakenSet1: %A" krakenSet1
-
-        saveSetToFile "./bitfinexPairs.txt" bitfinexSet1
-        saveSetToFile "./bitstampPairs.txt" bitstampSet1
-        saveSetToFile "./krakenPairs.txt" krakenSet1
-
         let crossTradedPairs = IdentifyCrossTradedPairsService(bitfinexSet1, bitstampSet1, krakenSet1)
 
         saveSetToFile "./crossTradedPairs.txt" crossTradedPairs
@@ -100,9 +91,3 @@ let identifyCrossTradedPairs () =
 
 // printCrossTradedPairs () |> Async.RunSynchronously
 // identifyCrossTradedPairs () |> Async.RunSynchronously
-// Execute the async function and print the results
-[<EntryPoint>]
-let main argv =
-    let task = identifyCrossTradedPairs () |> Async.StartAsTask
-    task.Result |> Set.iter (fun (pair1, pair2) -> printfn "%s-%s" pair1 pair2)
-    0 // return an integer exit code
