@@ -21,7 +21,7 @@ let fetchTransactions startDate endDate =
 
     let commandText = sprintf """
         SELECT TransactionType, Price, Amount, TransactionDate
-        FROM transactions
+        FROM Transactions
         WHERE TransactionDate >= @startDate AND TransactionDate <= @endDate;
         """
     
@@ -55,6 +55,7 @@ let parseDate (dateStr: string) =
 
 let pnlHandler (ctx: HttpContext) : Async<HttpContext option> =
     async {
+        let now = DateTime.UtcNow
         let startDateStr = ctx.request.queryParam "start"
         let endDateStr = ctx.request.queryParam "end"
         
@@ -62,18 +63,33 @@ let pnlHandler (ctx: HttpContext) : Async<HttpContext option> =
             match param with
             | Choice1Of2 value -> parseDate value
             | Choice2Of2 _ -> None
+            
+        let adjustEndDate (date: DateTime) =
+            match date.Date with
+            | d when d = now.Date -> now
+            | d -> d.AddDays(1.0).AddTicks(-1L)
 
+        let validateDates startDate endDate =
+            match startDate, endDate with
+            | s, e when e > now -> Some "End date cannot be in the future."
+            | s, e when s > e -> Some "Start date must be before end date."
+            | _ -> None
+            
         match parseQueryParam startDateStr, parseQueryParam endDateStr with
         | Some startDate, Some endDate ->
-            let transactions = fetchTransactions startDate endDate
-            match calculateHistoricalPnL transactions { StartDate = startDate; EndDate = endDate } with
-            | Ok resultData ->
-                let json = JsonConvert.SerializeObject(resultData)
-                return! OK json ctx
-            | Error errMsg ->
-                return! BAD_REQUEST errMsg ctx
-        | _, _ ->
-            return! BAD_REQUEST "Invalid date format. Please use YYYY-MM-DD." ctx
+            let adjustedEndDate = adjustEndDate endDate
+            match validateDates startDate adjustedEndDate with
+            | None ->
+                let transactions = fetchTransactions startDate adjustedEndDate
+                match transactions with
+                | [] -> return! BAD_REQUEST "No transactions between start date and end date." ctx
+                | _ ->
+                    let dateRange = { StartDate = startDate; EndDate = adjustedEndDate }
+                    let resultData = calculateHistoricalPnL transactions dateRange
+                    let json = JsonConvert.SerializeObject(resultData)
+                    return! OK json ctx
+            | Some errorMsg -> return! BAD_REQUEST errorMsg ctx
+        | _, _ -> return! BAD_REQUEST "Please provide both start and end dates." ctx
     }
 
 
