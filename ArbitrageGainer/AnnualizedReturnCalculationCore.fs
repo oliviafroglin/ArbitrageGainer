@@ -19,8 +19,12 @@ let calculateInitialInvestment (transactions: CompletedTransaction list) =
         ) 0m
 
 let calculateAnnualizedReturn (investment: InvestmentDetails) =
-    let ratio = investment.TotalReturn / investment.InitialInvestment
-    let exponent = 1.0 / investment.DurationYears
-    Math.Pow(Convert.ToDouble(ratio), exponent) - 1.0
+    match investment.DurationYears with
+    | 0.0 -> raise (DivideByZeroException "Cannot calculate return for zero duration.")
+    | _ ->
+        let ratio = investment.TotalReturn / investment.InitialInvestment
+        let exponent = 1.0 / investment.DurationYears
+        Math.Pow(Convert.ToDouble(ratio), exponent) - 1.0
+
 
 

@@ -1,56 +1,94 @@
 module AnnualizedReturnCalculationTests
 
 open NUnit.Framework
-open AnnualizedReturnCalculation
+open AnnualizedReturnCalculationCore
+open PnLCalculationCore
 open System
 
 [<TestFixture>]
-type AnnualizedReturnCalculationTests() =
+type AnnualizedReturnTests() =
 
     [<Test>]
-    member this.``Annualized Return for Valid Input`` () =
-        let initialInvestment = 1000
-        let totalReturn = 1200
-        let startTime = DateTime(2020, 1, 1)
-        match calculateAnnualizedReturn initialInvestment totalReturn startTime with
-        | Ok annualizedReturn -> Assert.IsTrue(annualizedReturn > 0)
-        | Error _ -> Assert.Fail("Expected a successful calculation of annualized return.")
-    
-    [<Test>]
-    member this.``Annualized Return for Invalid Duration, start time is in future`` () =
-        let initialInvestment = 1000
-        let totalReturn = 1200000
-        let startTime = DateTime.UtcNow.AddMinutes(1)
-        match calculateAnnualizedReturn initialInvestment totalReturn startTime with
-        | Ok _ -> Assert.Fail("Expected failure due to invalid duration.")
-        | Error (InvalidDuration _) -> Assert.Pass("Correctly identified invalid duration.")
-        | Error _ -> Assert.Fail("Unexpected error type.")
+    member this.``Calculate Initial Investment with No Transactions``() =
+        let transactions = []
+        let result = calculateInitialInvestment transactions
+        Assert.AreEqual(0m, result, "Expected initial investment to be zero with no transactions.")
 
     [<Test>]
-    member this.``Annualized Return for Negative Total Return`` () =
-        let initialInvestment = 1000
-        let totalReturn = -200 // Scenario with a loss
-        let startTime = DateTime(2020, 1, 1)
-        match calculateAnnualizedReturn initialInvestment totalReturn startTime with
-        | Ok annualizedReturn -> Assert.IsTrue(annualizedReturn < 0, "Expected a negative annualized return.")
-        | Error _ -> Assert.Fail("Expected a successful calculation, even with a negative return.")
+    member this.``Calculate Initial Investment with Only Buys``() =
+        let transactions = [
+            { TransactionType = Buy; BuyPrice = 200m; SellPrice = 0m; Amount = 2m; TransactionDate = DateTime(2020, 1, 1) }
+        ]
+        let result = calculateInitialInvestment transactions
+        Assert.AreEqual(-400m, result, "Expected initial investment to be negative due to only buys.")
 
     [<Test>]
-    member this.``Annualized Return for Very Short Investment Period`` () =
-        let initialInvestment = 1000
-        let totalReturn = 1010
-        let startTime = DateTime.UtcNow.AddDays(-15) // 15 days ago
-        match calculateAnnualizedReturn initialInvestment totalReturn startTime with
-        | Ok annualizedReturn -> Assert.IsTrue(annualizedReturn > 0, "Expected a positive annualized return for a short period.")
-        | Error _ -> Assert.Fail("Expected a successful calculation for a short investment period.")
+    member this.``Calculate Initial Investment with Only Sells``() =
+        let transactions = [
+            { TransactionType = Sell; BuyPrice = 0m; SellPrice = 300m; Amount = 3m; TransactionDate = DateTime(2020, 1, 1) }
+        ]
+        let result = calculateInitialInvestment transactions
+        Assert.AreEqual(900m, result, "Expected initial investment to be positive due to only sells.")
 
     [<Test>]
-    member this.``Annualized Return for Zero Initial Investment`` () =
-        let initialInvestment = 0 // Scenario where there was no initial investment
-        let totalReturn = 1000
-        let startTime = DateTime(2020, 1, 1)
-        match calculateAnnualizedReturn initialInvestment totalReturn startTime with
-        | Ok _ -> Assert.Fail("Expected failure due to zero initial investment.")
-        | Error (InvalidInitialInvestment msg) -> Assert.IsTrue(msg.Contains("Initial investment must be greater than zero"), "Expected validation failure for zero initial investment.")
-        | Error _ -> Assert.Fail("Unexpected error type.")
+    member this.``Annualized Return for Zero Duration``() =
+        let investmentDetails = {
+            StartDate = DateTime(2020, 1, 1)
+            InitialInvestment = 1000m
+            TotalReturn = 1200m
+            DurationYears = 0.0  // This will cause division by zero in the calculation
+        }
+        try
+            let result = calculateAnnualizedReturn investmentDetails
+            Assert.Fail("Expected a division by zero exception, but calculation succeeded with result: " + result.ToString())
+        with
+        | :? System.DivideByZeroException -> Assert.Pass("Division by zero exception correctly thrown.")
+        | ex -> Assert.Fail("Expected a division by zero exception, but got another type: " + ex.GetType().ToString())
+
+
+
+    [<Test>]
+    member this.``Annualized Return for Negative Initial Investment``() =
+        let investmentDetails = {
+            StartDate = DateTime(2020, 1, 1)
+            InitialInvestment = -1000m
+            TotalReturn = 1200m
+            DurationYears = 1.0
+        }
+        let result = calculateAnnualizedReturn investmentDetails
+        Assert.IsTrue(result < 0.0, "Expected a negative annualized return due to the nature of negative initial investment resulting in a decremental outcome.")
+
+
+    [<Test>]
+    member this.``Annualized Return with Exponential Growth``() =
+        let investmentDetails = {
+            StartDate = DateTime(2020, 1, 1)
+            InitialInvestment = 1m
+            TotalReturn = 1000m
+            DurationYears = 1.0
+        }
+        let result = calculateAnnualizedReturn investmentDetails
+        Assert.IsTrue(result > 0.0, "Expected a very high annualized return due to exponential growth relative to the small initial investment.")
+
+    [<Test>]
+    member this.``Annualized Return Calculation Precision``() =
+        let investmentDetails = {
+            StartDate = DateTime(2020, 1, 1)
+            InitialInvestment = 1000m
+            TotalReturn = 1000.01m
+            DurationYears = 1.0
+        }
+        let result = calculateAnnualizedReturn investmentDetails
+        Assert.IsTrue(result > 0.0 && result < 0.0001, "Expected a very small positive annualized return, testing precision of the calculation.")
+
+    [<Test>]
+    member this.``Annualized Return for Long Duration``() =
+        let investmentDetails = {
+            StartDate = DateTime(2000, 1, 1)
+            InitialInvestment = 1000m
+            TotalReturn = 2000m
+            DurationYears = 20.0
+        }
+        let result = calculateAnnualizedReturn investmentDetails
+        Assert.IsTrue(result > 0.0, "Expected a positive annualized return over a long investment period.")
 
