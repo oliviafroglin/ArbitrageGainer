@@ -10,6 +10,7 @@ open HistoricalDataAnalysisInfra
 open IdentifyCrossTradedPairsInfra
 open ManagePnLThresholdInfra
 open PnLCalculationInfra
+open AnnualizedReturnCalculationInfra
 
 let app : WebPart =
     choose [
@@ -32,7 +33,7 @@ let app : WebPart =
                     return! Successful.OK json ctx
                 })
             path "/pnl/historical" >=> pnlHandler
-            // path "/annualized-return" >=> annualizedReturnHandler
+            path "/annualized-return" >=> annualizedReturnHandler
         ]
     ]
 [<EntryPoint>]

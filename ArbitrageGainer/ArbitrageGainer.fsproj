@@ -7,10 +7,11 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Include="AnnualizedReturnCalculation.fs" />
+    <Compile Include="PnLCalculationCore.fs" />
+    <Compile Include="PnLCalculationService.fs" />
+    <Compile Include="PnLCalculationInfra.fs" />
     <Compile Include="AnnualizedReturnCalculationCore.fs" />
     <Compile Include="AnnualizedReturnCalculationInfra.fs" />
-    <Compile Include="ManagePnLThreshold.fs" />
     <Compile Include="ManagePnLThresholdCore.fs" />
     <Compile Include="ManagePnLThresholdService.fs" />
     <Compile Include="ManagePnLThresholdInfra.fs" />
@@ -26,14 +27,15 @@
     <Compile Include="IdentifyCrossTradedPairsCore.fs" />
     <Compile Include="IdentifyCrossTradedPairsService.fs" />
     <Compile Include="IdentifyCrossTradedPairsInfra.fs" />
-    <Compile Include="mainWenxi.fs" />
     <Compile Include="WebApp.fs" />
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="FSharp.Data" Version="6.4.0" />
+    <PackageReference Include="FSharp.Data.Npgsql" Version="2.1.0" />
     <PackageReference Include="MySql.Data" Version="8.3.0" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+    <PackageReference Include="Npgsql" Version="8.0.2" />
     <PackageReference Include="Suave" Version="2.6.2" />
     <PackageReference Include="System.Net.Http.Json" Version="8.0.0" />
   </ItemGroup>
