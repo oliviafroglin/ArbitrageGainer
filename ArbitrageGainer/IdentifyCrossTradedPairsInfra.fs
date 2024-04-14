@@ -8,6 +8,7 @@ open System.Net.Http
 open FSharp.Data
 open System.Threading.Tasks
 open System.IO
+open MySql.Data.MySqlClient
 
 let httpClient = new HttpClient()
 
@@ -61,6 +62,38 @@ let saveSetToFile filePath (currencyPairs : Set<CurrencyPair>) =
         |> Set.fold (fun acc pair -> acc + pair + "\n") ""
     File.WriteAllText(filePath, content)
 
+let connectionString = "Server=cmu-fp.mysql.database.azure.com;Database=team_database_schema;Uid=sqlserver;Pwd=-*lUp54$JMRku5Ay;SslMode=Required;"
+
+let initializeDatabase () =
+    let connection = new MySqlConnection(connectionString)
+    let commandText = """
+        DROP TABLE IF EXISTS cross_traded_pairs;
+        CREATE TABLE cross_traded_pairs (
+            BaseCurrency VARCHAR(255),
+            QuoteCurrency VARCHAR(255),
+            PRIMARY KEY (BaseCurrency, QuoteCurrency)
+        );
+    """
+    try
+        connection.Open()
+        let command = new MySqlCommand(commandText, connection)
+        command.ExecuteNonQuery() |> ignore
+    finally
+        connection.Close()
+
+let savePairsToDatabase (pairs: (string * string) list) =
+    let connection = new MySqlConnection(connectionString)
+    let insertCommand = "INSERT INTO cross_traded_pairs (BaseCurrency, QuoteCurrency) VALUES (@base, @quote)"
+    try
+        connection.Open()
+        pairs |> List.iter (fun (b, quote) ->
+            let command = new MySqlCommand(insertCommand, connection)
+            command.Parameters.AddWithValue("@base", b)
+            command.Parameters.AddWithValue("@quote", quote)
+            command.ExecuteNonQuery() |> ignore)
+    finally
+        connection.Close()
+
 let identifyCrossTradedPairs () =
     async {
         let! bitfinexPairs = fetchCurrencyPairsFromBitfinex ()
@@ -79,7 +112,11 @@ let identifyCrossTradedPairs () =
 
         saveSetToFile "./crossTradedPairs.txt" crossTradedPairs
 
-        printfn "crossTradedPairs: %A" crossTradedPairs
+        initializeDatabase()
+        savePairsToDatabase(Set.toList crossTradedPairs)
+
+        printfn "Stored cross-traded pairs: %A" crossTradedPairs
+
         return crossTradedPairs
     }
 
