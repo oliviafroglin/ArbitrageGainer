@@ -4,16 +4,19 @@
     <RestoreSuccess Condition=" '$(RestoreSuccess)' == '' ">True</RestoreSuccess>
     <RestoreTool Condition=" '$(RestoreTool)' == '' ">NuGet</RestoreTool>
     <ProjectAssetsFile Condition=" '$(ProjectAssetsFile)' == '' ">$(MSBuildThisFileDirectory)project.assets.json</ProjectAssetsFile>
-    <NuGetPackageRoot Condition=" '$(NuGetPackageRoot)' == '' ">/Users/olivia/.nuget/packages/</NuGetPackageRoot>
-    <NuGetPackageFolders Condition=" '$(NuGetPackageFolders)' == '' ">/Users/olivia/.nuget/packages/</NuGetPackageFolders>
+    <NuGetPackageRoot Condition=" '$(NuGetPackageRoot)' == '' ">/Users/haimingchen/.nuget/packages/</NuGetPackageRoot>
+    <NuGetPackageFolders Condition=" '$(NuGetPackageFolders)' == '' ">/Users/haimingchen/.nuget/packages/</NuGetPackageFolders>
     <NuGetProjectStyle Condition=" '$(NuGetProjectStyle)' == '' ">PackageReference</NuGetProjectStyle>
     <NuGetToolVersion Condition=" '$(NuGetToolVersion)' == '' ">6.3.3</NuGetToolVersion>
   </PropertyGroup>
   <ItemGroup Condition=" '$(ExcludeRestorePackageImports)' != 'true' ">
-    <SourceRoot Include="/Users/olivia/.nuget/packages/" />
+    <SourceRoot Include="/Users/haimingchen/.nuget/packages/" />
   </ItemGroup>
   <PropertyGroup Condition=" '$(ExcludeRestorePackageImports)' != 'true' ">
-    <PkgNewtonsoft_Json Condition=" '$(PkgNewtonsoft_Json)' == '' ">/Users/olivia/.nuget/packages/newtonsoft.json/13.0.3</PkgNewtonsoft_Json>
-    <PkgFSharp_Core Condition=" '$(PkgFSharp_Core)' == '' ">/Users/olivia/.nuget/packages/fsharp.core/6.0.7</PkgFSharp_Core>
+    <PkgSystem_Net_Http_Json Condition=" '$(PkgSystem_Net_Http_Json)' == '' ">/Users/haimingchen/.nuget/packages/system.net.http.json/8.0.0</PkgSystem_Net_Http_Json>
+    <PkgFSharp_Core Condition=" '$(PkgFSharp_Core)' == '' ">/Users/haimingchen/.nuget/packages/fsharp.core/6.0.7</PkgFSharp_Core>
+    <PkgSuave Condition=" '$(PkgSuave)' == '' ">/Users/haimingchen/.nuget/packages/suave/2.6.2</PkgSuave>
+    <PkgNewtonsoft_Json Condition=" '$(PkgNewtonsoft_Json)' == '' ">/Users/haimingchen/.nuget/packages/newtonsoft.json/13.0.3</PkgNewtonsoft_Json>
+    <PkgFSharp_Data Condition=" '$(PkgFSharp_Data)' == '' ">/Users/haimingchen/.nuget/packages/fsharp.data/6.4.0</PkgFSharp_Data>
   </PropertyGroup>
 </Project>
