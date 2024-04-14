@@ -19,8 +19,8 @@ type PnLThresholdAgent() =
                 | Valid validThreshold ->
                     replyChannel.Reply(ThresholdResult.Ok validThreshold)
                     return! messageLoop validThreshold
-                | Invalid ->
-                    replyChannel.Reply(ThresholdResult.Error "Threshold must be greater than or equal to 0.")
+                | Invalid errorMsg ->
+                    replyChannel.Reply(ThresholdResult.Error errorMsg)
                     return! messageLoop currentThreshold
 
             | GetThreshold replyChannel ->
@@ -30,7 +30,8 @@ type PnLThresholdAgent() =
         messageLoop 0M)  // Initial threshold
 
     member this.SetThreshold(threshold: decimal) =
-        agent.PostAndAsyncReply(fun replyChannel -> SetThreshold(threshold, replyChannel))
+        agent.PostAndAsyncReply(fun replyChannel -> SetThreshold (threshold, replyChannel))
+
 
     member this.GetThreshold() =
         agent.PostAndAsyncReply(fun replyChannel -> GetThreshold(replyChannel))

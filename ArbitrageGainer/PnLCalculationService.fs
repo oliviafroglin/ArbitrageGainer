@@ -1,11 +1,21 @@
 module PnLCalculationService
 
 open PnLCalculationCore
-open PnLCalculationInfra
 
 let calculateTotalPnL transactions =
-    transactions |> List.map PnLCalculationCore.calculateProfitLoss |> List.sumBy (function Profit p -> p | _ -> 0M)
+    transactions |> List.map calculateProfitLoss |> List.sumBy (function Profit p -> p | Loss l -> -l)
+
+let calculatePnL opportunity =
+    calculateProfitLossForOpportunity opportunity
 
 let calculateHistoricalPnL transactions dateRange =
-    transactions |> List.filter (fun t -> t.TransactionDate >= dateRange.StartDate && t.TransactionDate <= dateRange.EndDate)
-                 |> calculateTotalPnL
+    if List.isEmpty transactions then
+        Error "No transactions found in the given date range."
+    else
+        let filteredTransactions = transactions |> List.filter (fun t -> t.TransactionDate >= dateRange.StartDate && t.TransactionDate <= dateRange.EndDate)
+        if List.isEmpty filteredTransactions then
+            Error "No transactions found in the given date range."
+        else
+            let totalPnL = calculateTotalPnL filteredTransactions
+            if totalPnL >= 0M then Ok (Profit totalPnL)
+            else Ok (Loss (-totalPnL))
