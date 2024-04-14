@@ -49,44 +49,6 @@ let fetchTransactionsForDay (date: DateTime) : list<CompletedTransaction>=
 
     transactions
 
-// let annualizedReturnHandler (ctx: HttpContext) : Async<HttpContext option> =
-//     async {
-//         match ctx.request.queryParam "startDate" with
-//         | Choice1Of2 startDateStr ->
-//             let parseDate (dateStr: string) =
-//                 match DateTime.TryParseExact(dateStr, "yyyy-MM-dd", CultureInfo.InvariantCulture, DateTimeStyles.None) with
-//                 | true, date -> Some date
-//                 | _ -> None
-//
-//             match parseDate startDateStr with
-//             | Some startDate ->
-//                 let transactions = fetchTransactionsForDay startDate  // Correctly uses DateTime
-//                 let initialInvestment = calculateInitialInvestment transactions
-//                 let endDate = DateTime.Now
-//                 let dateRange = { StartDate = startDate; EndDate = endDate }
-//                 let totalReturn = calculateHistoricalPnL transactions dateRange
-//                 let durationYears = (endDate - startDate).TotalDays / 365.25
-//
-//                 match totalReturn with
-//                 | Ok profitOrLoss ->
-//                     let totalReturnAmount = 
-//                         match profitOrLoss with
-//                         | Profit p -> p
-//                         | Loss l -> -l
-//                     let investmentDetails = {
-//                         StartDate = startDate; 
-//                         InitialInvestment = initialInvestment; 
-//                         TotalReturn = totalReturnAmount; 
-//                         DurationYears = durationYears 
-//                     }
-//                     let annualizedReturn = calculateAnnualizedReturn investmentDetails
-//                     return! OK (sprintf "{\"Annualized Return\": %f}" annualizedReturn) ctx
-//                 | Error msg -> return! BAD_REQUEST (sprintf "Error calculating PnL: %s" msg) ctx
-//             | None -> return! BAD_REQUEST "Invalid startDate format. Please use YYYY-MM-DD." ctx
-//         | Choice2Of2 errMsg -> return! BAD_REQUEST (sprintf "Error retrieving 'startDate' parameter: %s" errMsg) ctx
-//     }
-    
-
 let annualizedReturnHandler (ctx: HttpContext) : Async<HttpContext option> =
     async {
         match ctx.request.queryParam "startDate" with
