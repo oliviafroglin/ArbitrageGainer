@@ -69,6 +69,7 @@ HTTP Response Handling: The [annualizedReturnHandler](https://github.com/oliviaf
 3. **P & L Calculation** 
 * [Infra](https://github.com/oliviafroglin/FunctionalProgramming/blob/main/ArbitrageGainer/PnLCalculationInfra.fs) \
 Date Parsing and Validation [(here)](https://github.com/oliviafroglin/FunctionalProgramming/blob/ca4d0ab69357a004a12a4da22510973659dd2ed9/ArbitrageGainer/PnLCalculationInfra.fs#L80): Errors in date parsing or invalid date ranges result in immediate HTTP 400 responses. These are handled explicitly, ensuring users are informed of input errors.
+Generic Exception Handling [(here)](https://github.com/oliviafroglin/FunctionalProgramming/blob/9b658c91e2f830d74ec467011e9adc3e75459838/ArbitrageGainer/PnLCalculationInfra.fs#L51): This approach ensures that no type of exception goes unhandled, providing a catch-all safety net for any runtime issues that might occur during database operations.
 * [Service](https://github.com/oliviafroglin/FunctionalProgramming/blob/main/ArbitrageGainer/PnLCalculationService.fs) \
 Calculate PnL Functions [(here)](https://github.com/oliviafroglin/FunctionalProgramming/blob/ca4d0ab69357a004a12a4da22510973659dd2ed9/ArbitrageGainer/PnLCalculationService.fs#L11): These functions handle errors in transaction data processing by returning structured results (Profit or Loss), encapsulating potential errors in business logic (e.g., incorrect calculations based on transaction types).
 
@@ -88,4 +89,5 @@ Divide by Zero: The [calculateAnnualizedReturn](https://github.com/oliviafroglin
 
 * [Infra](https://github.com/oliviafroglin/FunctionalProgramming/blob/main/ArbitrageGainer/AnnualizedReturnCalculationInfra.fs) \
 Input Validation: The [handler function](https://github.com/oliviafroglin/FunctionalProgramming/blob/ca4d0ab69357a004a12a4da22510973659dd2ed9/ArbitrageGainer/AnnualizedReturnCalculationInfra.fs#L65) validates the input date format and checks if the start date is in the future, responding with an HTTP 400 (Bad Request) if there are any issues.
+Generic Exception Handling [(here)](https://github.com/oliviafroglin/FunctionalProgramming/blob/9b658c91e2f830d74ec467011e9adc3e75459838/ArbitrageGainer/AnnualizedReturnCalculationInfra.fs#L53): employ a generic exception handler that catches all exceptions (including database connection error). 
 
