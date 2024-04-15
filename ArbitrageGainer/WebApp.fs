@@ -13,7 +13,7 @@ open OrderExecutionInfra
 let app : WebPart =
     choose [
         POST >=> choose [
-            path "/update-config" >=> updateConfig
+            path "/config" >=> updateConfig
             path "/start-trading" >=> startTrading
             path "/stop-trading" >=> stopTrading
             path "/pnl/threshold" >=> updateThresholdHandler
