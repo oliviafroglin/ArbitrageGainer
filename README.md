@@ -23,14 +23,20 @@ Path: `./ArbitrageGainer/OrderExecutionInfra.fs`
 
 #### 6. P & L Calculation
 
-Path: `./ArbitrageGainer/PnLCalculation.fs` \
+Path: `./ArbitrageGainer/PnLCalculationCore.fs` \
+	  `./ArbitrageGainer/PnLCalculationService.fs` \
+	  `./ArbitrageGainer/PnLCalculationInfra.fs` \
 Test: `./ArbitrageGainer.Tests/PnLCalculationTests.fs`
 
 #### 7. P & L Threshold Management
 
-Path: `./ArbitrageGainer/ManagePnLThreshold.fs`
+Path: `./ArbitrageGainer/ManagePnLThresholdCore.fs` \
+	  `./ArbitrageGainer/ManagePnLThresholdService.fs` \
+	  `./ArbitrageGainer/ManagePnLThresholdInfra.fs`
 
 #### 8. Annualized Return (on demand)
 
-Path: `./ArbitrageGainer/AnnualizedReturnCalculation.fs` \
+Path: `./ArbitrageGainer/AnnualizedReturnCalculationCore.fs` \
+	  `./ArbitrageGainer/AnnualizedReturnCalculationService.fs` \
+	  `./ArbitrageGainer/AnnualizedReturnCalculationInfra.fs` \
 Test: `./ArbitrageGainer.Tests/AnnualizedReturnCalculationTests.fs`
