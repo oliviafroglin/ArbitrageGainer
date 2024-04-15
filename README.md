@@ -11,15 +11,15 @@ Path: `./ArbitrageGainer/IdentifyCrossTradedPairs.fs`
 
 #### 3. MarketDataRetrieval
 
-Path: `./ArbitrageGainer/MarketDataRetrieval.fs` 
+Path: `./ArbitrageGainer/MarketDataRetrieval.fs`
 
 #### 4. ArbitrageOpportunityIdentifier
 
-Path: `./ArbitrageGainer/ArbitrageOpportunityIdentifier.fs` 
+Path: `./ArbitrageGainer/ArbitrageOpportunityIdentifier.fs`
 
 #### 5. Order Execution
 
-Path: `./ArbitrageGainer/OrderExecution.fs` 
+Path: `./ArbitrageGainer/OrderExecutionInfra.fs`
 
 #### 6. P & L Calculation
 
