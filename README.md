@@ -20,7 +20,7 @@ Path: [Core](https://github.com/oliviafroglin/FunctionalProgramming/blob/main/Ar
 
 #### 5. Order Execution
 
-Path: `./ArbitrageGainer/OrderExecutionInfra.fs`
+Path: [Infra](https://github.com/oliviafroglin/FunctionalProgramming/blob/main/ArbitrageGainer/OrderExecutionInfra.fs)
 
 #### 6. P & L Calculation
 
