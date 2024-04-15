@@ -2,12 +2,13 @@
 
 #### 1. Historical spread calculation algorithm
 
-Path: `./ArbitrageGainer/HistoricalDataAnalysis.fs` \
-Test: `./ArbitrageGainer.Tests/HistoricalDataAnalysisTests.fs`
+Path: [Core](https://github.com/oliviafroglin/FunctionalProgramming/blob/main/ArbitrageGainer/HistoricalDataAnalysisCore.fs), [Service](https://github.com/oliviafroglin/FunctionalProgramming/blob/main/ArbitrageGainer/HistoricalDataAnalysisService.fs), [Infra](https://github.com/oliviafroglin/FunctionalProgramming/blob/main/ArbitrageGainer/HistoricalDataAnalysisInfra.fs) \
+Test: [HistoricalDataAnalysisTests.fs](https://github.com/oliviafroglin/FunctionalProgramming/blob/main/ArbitrageGainer.Tests/HistoricalDataAnalysisTests.fs)
 
 #### 2. Identify Cross Traded Pairs
 
-Path: `./ArbitrageGainer/IdentifyCrossTradedPairs.fs`
+Path: [Core](https://github.com/oliviafroglin/FunctionalProgramming/blob/main/ArbitrageGainer/IdentifyCrossTradedPairsCore.fs), [Service](https://github.com/oliviafroglin/FunctionalProgramming/blob/main/ArbitrageGainer/IdentifyCrossTradedPairsService.fs), [Infra](https://github.com/oliviafroglin/FunctionalProgramming/blob/main/ArbitrageGainer/IdentifyCrossTradedPairsInfra.fs)
+
 
 #### 3. MarketDataRetrieval
 
