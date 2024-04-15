@@ -12,11 +12,12 @@
     <Compile Include="AnnualizedReturnCalculationTests.fs" />
     <Compile Include="PnLCalculationTests.fs" />
     <Compile Include="HistoricalDataAnalysisTests.fs" />
-    <Compile Include="Program.fs" />
+    <Compile Include="ManagePnLThresholdTests.fs" />
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.6.0" />
+    <PackageReference Include="Moq" Version="4.20.70" />
     <PackageReference Include="NUnit" Version="3.13.3" />
     <PackageReference Include="NUnit3TestAdapter" Version="4.2.1" />
     <PackageReference Include="NUnit.Analyzers" Version="3.6.1" />
@@ -25,6 +26,7 @@
     <PackageReference Include="FSharp.Data" Version="6.4.0" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageReference Include="Suave" Version="2.6.2" />
+    <PackageReference Include="Suave.Testing" Version="2.2.1" />
     <PackageReference Include="System.Net.Http.Json" Version="8.0.0" />
   </ItemGroup>
 
