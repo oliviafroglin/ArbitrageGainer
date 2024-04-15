@@ -30,7 +30,7 @@
 
 7. P & L Threshold Management
 
-    Path: [Core](https://github.com/oliviafroglin/FunctionalProgramming/blob/main/ArbitrageGainer/ManagePnLThresholdCore.fs), [Service](https://github.com/oliviafroglin/FunctionalProgramming/blob/main/ArbitrageGainer/ManagePnLThresholdService.fs), [Infra](hhttps://github.com/oliviafroglin/FunctionalProgramming/blob/main/ArbitrageGainer/ManagePnLThresholdInfra.fs) \
+    Path: [Core](https://github.com/oliviafroglin/FunctionalProgramming/blob/main/ArbitrageGainer/ManagePnLThresholdCore.fs), [Service](https://github.com/oliviafroglin/FunctionalProgramming/blob/main/ArbitrageGainer/ManagePnLThresholdService.fs), [Infra](hhttps://github.com/oliviafroglin/FunctionalProgramming/blob/main/ArbitrageGainer/ManagePnLThresholdInfra.fs)  \
     Test: [ManagePnLThresholdTests.fs](https://github.com/oliviafroglin/FunctionalProgramming/blob/main/ArbitrageGainer.Tests/ManagePnLThresholdTests.fs)
 
 8. Annualized Return (on demand)
