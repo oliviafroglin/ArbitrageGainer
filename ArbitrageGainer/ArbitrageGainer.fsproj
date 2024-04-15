@@ -23,7 +23,6 @@
     <Compile Include="MarketDataRetrieval.fs" />
     <Compile Include="ArbitrageService.fs" />
     <Compile Include="ArbitrageInfra.fs" />
-    <Compile Include="OrderExecution.fs" />
     <Compile Include="OrderExecutionInfra.fs" />
     <Compile Include="IdentifyCrossTradedPairsCore.fs" />
     <Compile Include="IdentifyCrossTradedPairsService.fs" />
