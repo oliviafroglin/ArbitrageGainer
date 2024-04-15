@@ -10,7 +10,7 @@ open System.Reflection
 [<assembly: System.Reflection.AssemblyCompanyAttribute("ArbitrageGainer")>]
 [<assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")>]
 [<assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")>]
-[<assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0")>]
+[<assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+8f664e2da4e816e415233bfd084967ea0a498368")>]
 [<assembly: System.Reflection.AssemblyProductAttribute("ArbitrageGainer")>]
 [<assembly: System.Reflection.AssemblyTitleAttribute("ArbitrageGainer")>]
 [<assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")>]
