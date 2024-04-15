@@ -9,13 +9,15 @@ let calculatePnL (transaction:CompletedTransaction) =
     calculateProfitLoss transaction
 
 let calculateHistoricalPnL transactions dateRange =
-    if List.isEmpty transactions then
-        Error "No transactions found in the given date range."
-    else
+    match transactions with
+    | [] -> Error "No transactions found in the given date range."
+    | _ ->
         let filteredTransactions = transactions |> List.filter (fun t -> t.TransactionDate >= dateRange.StartDate && t.TransactionDate <= dateRange.EndDate)
-        if List.isEmpty filteredTransactions then
-            Error "No transactions found in the given date range."
-        else
+        match filteredTransactions with
+        | [] -> Error "No transactions found in the given date range."
+        | _ ->
             let totalPnL = calculateTotalPnL filteredTransactions
-            if totalPnL >= 0M then Ok (Profit totalPnL)
-            else Ok (Loss (-totalPnL))
+            match totalPnL with
+            | pnl when pnl >= 0M -> Ok (Profit pnl)
+            | pnl -> Ok (Loss (-pnl))
+

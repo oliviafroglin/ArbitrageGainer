@@ -16,36 +16,41 @@ open MySql.Data.MySqlClient
 let connectionString = "Server=cmu-fp.mysql.database.azure.com;Database=team_database_schema;Uid=sqlserver;Pwd=-*lUp54$JMRku5Ay;SslMode=Required;"
 
 let fetchTransactions startDate endDate =
-    use connection = new MySqlConnection(connectionString)
-    connection.Open()
+    try
+        use connection = new MySqlConnection(connectionString)
+        connection.Open()
 
-    let commandText = sprintf """
-        SELECT TransactionType, Price, Amount, TransactionDate
-        FROM Transactions
-        WHERE TransactionDate >= @startDate AND TransactionDate <= @endDate;
-        """
-    
-    use cmd = new MySqlCommand(commandText, connection)
-    cmd.Parameters.AddWithValue("@startDate", startDate)
-    cmd.Parameters.AddWithValue("@endDate", endDate)
-    use reader = cmd.ExecuteReader()
+        let commandText = sprintf """
+            SELECT TransactionType, Price, Amount, TransactionDate
+            FROM Transactions
+            WHERE TransactionDate >= @startDate AND TransactionDate <= @endDate;
+            """
+        
+        use cmd = new MySqlCommand(commandText, connection)
+        cmd.Parameters.AddWithValue("@startDate", startDate)
+        cmd.Parameters.AddWithValue("@endDate", endDate)
+        use reader = cmd.ExecuteReader()
 
-    let rec readTransactions acc =
-        match reader.Read() with
-        | true ->
-            let transactionType = 
-                match reader.GetString("TransactionType") with
-                | "Buy" -> Buy
-                | "Sell" -> Sell
-                | _ -> raise (InvalidOperationException("Invalid transaction type"))
-            let price = reader.GetDecimal("Price")
-            let amount = reader.GetDecimal("Amount")
-            let transactionDate = reader.GetDateTime("TransactionDate")
-            let transaction = { TransactionType = transactionType; Price = price; Amount = amount; TransactionDate = transactionDate }
-            readTransactions (transaction :: acc)
-        | false -> List.rev acc  // Reverse to maintain the order of transactions as they appeared in the database
+        let rec readTransactions acc =
+            match reader.Read() with
+            | true ->
+                let transactionType = 
+                    match reader.GetString("TransactionType") with
+                    | "Buy" -> Buy
+                    | "Sell" -> Sell
+                    | _ -> raise (InvalidOperationException("Invalid transaction type"))
+                let price = reader.GetDecimal("Price")
+                let amount = reader.GetDecimal("Amount")
+                let transactionDate = reader.GetDateTime("TransactionDate")
+                let transaction = { TransactionType = transactionType; Price = price; Amount = amount; TransactionDate = transactionDate }
+                readTransactions (transaction :: acc)
+            | false -> List.rev acc  // Reverse to maintain the order of transactions as they appeared in the database
 
-    readTransactions []
+        readTransactions []
+    with
+    | ex ->
+        printfn "Error connecting and fetching transactions from database: %s" ex.Message
+        raise ex
 
 let parseDate (dateStr: string) =
     match DateTime.TryParseExact(dateStr, "yyyy-MM-dd", CultureInfo.InvariantCulture, DateTimeStyles.None) with
