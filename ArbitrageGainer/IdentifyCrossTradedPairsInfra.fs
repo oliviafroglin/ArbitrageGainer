@@ -12,49 +12,68 @@ open MySql.Data.MySqlClient
 
 let httpClient = new HttpClient()
 
+// Fetches currency pairs from Bitfinex.
 let fetchCurrencyPairsFromBitfinex () =
     async {
-        let url = "https://api-pub.bitfinex.com/v2/conf/pub:list:pair:exchange"
-        let! response = httpClient.GetAsync(url) |> Async.AwaitTask
-        printfn "Response: %A" response
-        let! content = response.Content.ReadAsStringAsync() |> Async.AwaitTask
-        let data = JsonValue.Parse(content)
-        return data.[0].AsArray() |> Array.map (fun x -> 
-            let pair = x.AsString()
-            match pair.Contains(":") with
-            | true -> pair.Split(':')
-            | false ->
-                let middleIndex = pair.Length / 2
-                [| pair.[0..middleIndex-1]; pair[middleIndex..] |]
-            ) |> Array.choose (fun arr -> 
-                match arr.Length = 2 with 
-                | true -> Some (arr.[0], arr.[1])
-                | false -> None)
+        try
+            let url = "https://api-pub.bitfinex.com/v2/conf/pub:list:pair:exchange"
+            let! response = httpClient.GetAsync(url) |> Async.AwaitTask
+            printfn "Response: %A" response
+            let! content = response.Content.ReadAsStringAsync() |> Async.AwaitTask
+            let data = JsonValue.Parse(content)
+            return data.[0].AsArray() |> Array.map (fun x -> 
+                let pair = x.AsString()
+                match pair.Contains(":") with
+                | true -> pair.Split(':')
+                | false ->
+                    let middleIndex = pair.Length / 2
+                    [| pair.[0..middleIndex-1]; pair[middleIndex..] |]
+                ) |> Array.choose (fun arr -> 
+                    match arr.Length = 2 with 
+                    | true -> Some (arr.[0], arr.[1])
+                    | false -> None)
+        with
+        | ex ->
+            printfn "Error: %A" ex
+            return [||]
     }
 
+// Fetches currency pairs from Bitstamp.
 let fetchCurrencyPairsFromBitstamp () =
     async {
-        let url = "https://www.bitstamp.net/api/v2/ticker/"
-        let! response = httpClient.GetAsync(url) |> Async.AwaitTask
-        printfn "Response: %A" response
-        let! content = response.Content.ReadAsStringAsync() |> Async.AwaitTask
-        let data = JsonValue.Parse(content)
-        return data.AsArray() |> Array.map (fun x -> x.["pair"].AsString().Replace("/", ":").Split(':')) |> Array.choose (fun arr -> 
-                match arr.Length = 2 with 
-                | true -> Some (arr.[0], arr.[1])
-                | false -> None)
+        try
+            let url = "https://www.bitstamp.net/api/v2/ticker/"
+            let! response = httpClient.GetAsync(url) |> Async.AwaitTask
+            printfn "Response: %A" response
+            let! content = response.Content.ReadAsStringAsync() |> Async.AwaitTask
+            let data = JsonValue.Parse(content)
+            return data.AsArray() |> Array.map (fun x -> x.["pair"].AsString().Replace("/", ":").Split(':')) |> Array.choose (fun arr -> 
+                    match arr.Length = 2 with 
+                    | true -> Some (arr.[0], arr.[1])
+                    | false -> None)
+        with
+        | ex ->
+            printfn "Error: %A" ex
+            return [||]
     }
 
+// Fetches currency pairs from Kraken.
 let fetchCurrencyPairsFromKraken () =
     async {
-        let url = "https://api.kraken.com/0/public/AssetPairs"
-        let! response = httpClient.GetAsync(url) |> Async.AwaitTask
-        printfn "Response: %A" response
-        let! content = response.Content.ReadAsStringAsync() |> Async.AwaitTask
-        let data = JsonValue.Parse(content)
-        return data.["result"].Properties() |> Array.map (fun (_, v) -> (v.["base"].AsString(), v.["quote"].AsString()))
+        try
+            let url = "https://api.kraken.com/0/public/AssetPairs"
+            let! response = httpClient.GetAsync(url) |> Async.AwaitTask
+            printfn "Response: %A" response
+            let! content = response.Content.ReadAsStringAsync() |> Async.AwaitTask
+            let data = JsonValue.Parse(content)
+            return data.["result"].Properties() |> Array.map (fun (_, v) -> (v.["base"].AsString(), v.["quote"].AsString()))
+        with
+        | ex ->
+            printfn "Error: %A" ex
+            return [||]
     }
 
+// Saves a set of currency pairs to a file.
 let saveSetToFile filePath (currencyPairs : Set<CurrencyPair>) =
     let content = 
         currencyPairs
@@ -62,6 +81,7 @@ let saveSetToFile filePath (currencyPairs : Set<CurrencyPair>) =
         |> Set.fold (fun acc pair -> acc + pair + "\n") ""
     File.WriteAllText(filePath, content)
 
+// Initializes the database by creating a table to store cross-traded pairs.
 let connectionString = "Server=cmu-fp.mysql.database.azure.com;Database=team_database_schema;Uid=sqlserver;Pwd=-*lUp54$JMRku5Ay;SslMode=Required;"
 
 let initializeDatabase () =
@@ -78,9 +98,12 @@ let initializeDatabase () =
         connection.Open()
         let command = new MySqlCommand(commandText, connection)
         command.ExecuteNonQuery() |> ignore
-    finally
-        connection.Close()
+    with
+    | ex ->
+        printfn "Error initializing database: %s" ex.Message
+    connection.Close()
 
+// Saves a list of currency pairs to the database.
 let savePairsToDatabase (pairs: (string * string) list) =
     let connection = new MySqlConnection(connectionString)
     let insertCommand = "INSERT INTO cross_traded_pairs (BaseCurrency, QuoteCurrency) VALUES (@base, @quote)"
@@ -91,9 +114,12 @@ let savePairsToDatabase (pairs: (string * string) list) =
             command.Parameters.AddWithValue("@base", b)
             command.Parameters.AddWithValue("@quote", quote)
             command.ExecuteNonQuery() |> ignore)
-    finally
-        connection.Close()
+    with
+    | ex ->
+        printfn "Error saving cross pairs to database: %s" ex.Message
+    connection.Close()
 
+// Identifies cross-traded pairs by fetching currency pairs from Bitfinex, Bitstamp, and Kraken.
 let identifyCrossTradedPairs () =
     async {
         let! bitfinexPairs = fetchCurrencyPairsFromBitfinex ()

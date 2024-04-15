@@ -2,6 +2,7 @@ module HistoricalDataAnalysisService
 
 open HistoricalDataAnalysisCore
 
+// Maps market data to arbitrage opportunities.
 let identifyArbitrageOpportunities (data: MarketData list): ArbitrageOpportunity list =
     data
     |> List.groupBy (fun d -> d.Pair)

@@ -2,6 +2,7 @@ module HistoricalDataAnalysisCore
 
 open Newtonsoft.Json
 
+// Represents market data.
 [<CLIMutable>]
 type MarketData = {
     [<JsonProperty("pair")>]
@@ -20,11 +21,13 @@ type MarketData = {
     Exchange: int
 }
 
+// Represents an arbitrage opportunity.
 type ArbitrageOpportunity = {
     Pair: string
     NumberOfOpportunities: int
 }
 
+// Maps market data to arbitrage opportunities.
 let mapPhase (quotes: MarketData list) =
     quotes |> List.groupBy (fun d -> d.Timestamp / 5L)
            |> List.collect (fun (_, bucketQuotes) ->
@@ -38,6 +41,7 @@ let mapPhase (quotes: MarketData list) =
                     | _ -> []
                 | _ -> [])
 
+// Reduces arbitrage opportunities to a list of pairs and the number of opportunities.
 let reducePhase (mappedData: (MarketData * MarketData) list) =
     mappedData
     |> List.map (fun (bid, ask) -> bid.Pair)
