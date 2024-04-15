@@ -1,4 +1,6 @@
-﻿open System
+﻿module OrderExecutionInfra
+
+open System
 open System.Net
 open System.Net.Mail
 open System.Threading
