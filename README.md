@@ -23,7 +23,7 @@ Path: `./ArbitrageGainer/OrderExecutionInfra.fs`
 
 #### 6. P & L Calculation
 
-Path: [Core] (https://github.com/oliviafroglin/FunctionalProgramming/blob/main/ArbitrageGainer/PnLCalculationCore.fs) \
+Path: [Core](https://github.com/oliviafroglin/FunctionalProgramming/blob/main/ArbitrageGainer/PnLCalculationCore.fs) \
 	  `./ArbitrageGainer/PnLCalculationService.fs` \
 	  `./ArbitrageGainer/PnLCalculationInfra.fs` \
 Test: `./ArbitrageGainer.Tests/PnLCalculationTests.fs`
