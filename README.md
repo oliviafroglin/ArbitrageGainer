@@ -12,11 +12,14 @@ Path: [Core](https://github.com/oliviafroglin/FunctionalProgramming/blob/main/Ar
 
 #### 3. MarketDataRetrieval
 
-Path: `./ArbitrageGainer/MarketDataRetrieval.fs`
+Path: [Core](https://github.com/oliviafroglin/FunctionalProgramming/blob/main/ArbitrageGainer/MarketDataRetrieval.fs), [Service](https://github.com/oliviafroglin/FunctionalProgramming/blob/main/ArbitrageGainer/ArbitrageService.fs), [Infra]
+(https://github.com/oliviafroglin/FunctionalProgramming/blob/main/ArbitrageGainer/ArbitrageInfra.fs)
 
 #### 4. ArbitrageOpportunityIdentifier
 
-Path: `./ArbitrageGainer/ArbitrageOpportunityIdentifier.fs`
+Path: [Core](https://github.com/oliviafroglin/FunctionalProgramming/blob/main/ArbitrageGainer/ArbitrageOpportunityIdentifier.fs), [Service]
+(https://github.com/oliviafroglin/FunctionalProgramming/blob/main/ArbitrageGainer/ArbitrageService.fs), [Infra]
+(https://github.com/oliviafroglin/FunctionalProgramming/blob/main/ArbitrageGainer/ArbitrageInfra.fs)
 
 #### 5. Order Execution
 
