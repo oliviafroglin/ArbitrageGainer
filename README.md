@@ -42,7 +42,7 @@ ArbitrageGainer/HistoricalDataAnalysisCore.fs: defines F# modules and types for 
 Database Access: The function [fetchTransactions](https://github.com/oliviafroglin/FunctionalProgramming/blob/ca4d0ab69357a004a12a4da22510973659dd2ed9/ArbitrageGainer/PnLCalculationInfra.fs#L18) interacts with MySQL database. This interaction includes connecting to the database, executing a query, and reading results. \
 HTTP Context Manipulations: The [pnlHandler](https://github.com/oliviafroglin/FunctionalProgramming/blob/ca4d0ab69357a004a12a4da22510973659dd2ed9/ArbitrageGainer/PnLCalculationInfra.fs#L55) function modifies the HTTP context by setting response status codes and bodies based on the outcome of its operations.
 
-6. **P & L Threshold Management** \
+6. **P & L Threshold Management** 
 * [Service](https://github.com/oliviafroglin/FunctionalProgramming/blob/main/ArbitrageGainer/ManagePnLThresholdService.fs) \
 State Changes through MailboxProcessor: The PnLThresholdAgent [(here)](https://github.com/oliviafroglin/FunctionalProgramming/blob/ca4d0ab69357a004a12a4da22510973659dd2ed9/ArbitrageGainer/ManagePnLThresholdService.fs#L12) uses a MailboxProcessor to maintain and update the threshold state asynchronously. This component changes state internally and affects the external behavior based on the threshold values it manages. \
 Asynchronous Responses: When setting or getting thresholds[(here)](https://github.com/oliviafroglin/FunctionalProgramming/blob/ca4d0ab69357a004a12a4da22510973659dd2ed9/ArbitrageGainer/ManagePnLThresholdService.fs#L32), the agent communicates asynchronously using `AsyncReplyChannel`, impacting the system's state asynchronously.
