@@ -96,16 +96,19 @@ HTTP Response Handling: The [annualizedReturnHandler](https://github.com/oliviaf
 
 ## 3. Error Handling
 1. **Market Data Retrieval** \
+* [Service](https://github.com/oliviafroglin/FunctionalProgramming/blob/main/ArbitrageGainer/ArbitrageService.fs) \
     tryParseQuote \
     processQuotes \
-    [Service](https://github.com/oliviafroglin/FunctionalProgramming/blob/main/ArbitrageGainer/ArbitrageService.fs)
+* [ArbitrageInfra](https://github.com/oliviafroglin/FunctionalProgramming/blob/main/ArbitrageGainer/ArbitrageInfra.fs) \
+    fetchCrossAndHistPairs \
+    
 
-2. **Order Execution** \
+3. **Order Execution** \
     File:OrderExecutionInfra.fs: 
 
     executeTransaction - Manages the transaction execution process, handles responses, and updates profit or notifies of failure, encapsulating outcomes in a Result.
 
-3. **P & L Calculation** 
+4. **P & L Calculation** 
 * [Infra](https://github.com/oliviafroglin/FunctionalProgramming/blob/main/ArbitrageGainer/PnLCalculationInfra.fs) \
 Date Parsing and Validation [(here)](https://github.com/oliviafroglin/FunctionalProgramming/blob/ca4d0ab69357a004a12a4da22510973659dd2ed9/ArbitrageGainer/PnLCalculationInfra.fs#L80): Errors in date parsing or invalid date ranges result in immediate HTTP 400 responses. These are handled explicitly, ensuring users are informed of input errors.
 Generic Exception Handling [(here)](https://github.com/oliviafroglin/FunctionalProgramming/blob/9b658c91e2f830d74ec467011e9adc3e75459838/ArbitrageGainer/PnLCalculationInfra.fs#L51): This approach ensures that no type of exception goes unhandled, providing a catch-all safety net for any runtime issues that might occur during database operations.
