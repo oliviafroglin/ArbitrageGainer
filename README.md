@@ -23,20 +23,14 @@ Path: `./ArbitrageGainer/OrderExecutionInfra.fs`
 
 #### 6. P & L Calculation
 
-Path: [Core](https://github.com/oliviafroglin/FunctionalProgramming/blob/main/ArbitrageGainer/PnLCalculationCore.fs) \
-	  `./ArbitrageGainer/PnLCalculationService.fs` \
-	  `./ArbitrageGainer/PnLCalculationInfra.fs` \
-Test: `./ArbitrageGainer.Tests/PnLCalculationTests.fs`
+Path: [Core](https://github.com/oliviafroglin/FunctionalProgramming/blob/main/ArbitrageGainer/PnLCalculationCore.fs), [Service](https://github.com/oliviafroglin/FunctionalProgramming/blob/updateReadMePnL/ArbitrageGainer/PnLCalculationService.fs), [Infra](https://github.com/oliviafroglin/FunctionalProgramming/blob/updateReadMePnL/ArbitrageGainer/PnLCalculationInfra.fs) \
+Test: [PnLCalculationTests.fs](https://github.com/oliviafroglin/FunctionalProgramming/blob/updateReadMePnL/ArbitrageGainer.Tests/PnLCalculationTests.fs)
 
 #### 7. P & L Threshold Management
 
-Path: `./ArbitrageGainer/ManagePnLThresholdCore.fs` \
-	  `./ArbitrageGainer/ManagePnLThresholdService.fs` \
-	  `./ArbitrageGainer/ManagePnLThresholdInfra.fs`
+Path: [Core](https://github.com/oliviafroglin/FunctionalProgramming/blob/updateReadMePnL/ArbitrageGainer/ManagePnLThresholdCore.fs), [Service](https://github.com/oliviafroglin/FunctionalProgramming/blob/updateReadMePnL/ArbitrageGainer/ManagePnLThresholdService.fs), [Infra](https://github.com/oliviafroglin/FunctionalProgramming/blob/updateReadMePnL/ArbitrageGainer/ManagePnLThresholdInfra.fs) 
 
 #### 8. Annualized Return (on demand)
 
-Path: `./ArbitrageGainer/AnnualizedReturnCalculationCore.fs` \
-	  `./ArbitrageGainer/AnnualizedReturnCalculationService.fs` \
-	  `./ArbitrageGainer/AnnualizedReturnCalculationInfra.fs` \
-Test: `./ArbitrageGainer.Tests/AnnualizedReturnCalculationTests.fs`
+Path: [Core](https://github.com/oliviafroglin/FunctionalProgramming/blob/updateReadMePnL/ArbitrageGainer/AnnualizedReturnCalculationCore.fs), [Infra](https://github.com/oliviafroglin/FunctionalProgramming/blob/updateReadMePnL/ArbitrageGainer/AnnualizedReturnCalculationInfra.fs) \
+Test: [AnnualizedReturnCalculationTests.fs](https://github.com/oliviafroglin/FunctionalProgramming/blob/updateReadMePnL/ArbitrageGainer.Tests/AnnualizedReturnCalculationTests.fs)
