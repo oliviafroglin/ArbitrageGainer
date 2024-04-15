@@ -1,42 +1,42 @@
 ## Link to repo: https://github.com/oliviafroglin/FunctionalProgramming/tree/main
 
 ## 1. Workflows
-#### 1. Historical spread calculation algorithm
+1. Historical spread calculation algorithm
 
-Path: [Core](https://github.com/oliviafroglin/FunctionalProgramming/blob/main/ArbitrageGainer/HistoricalDataAnalysisCore.fs), [Service](https://github.com/oliviafroglin/FunctionalProgramming/blob/main/ArbitrageGainer/HistoricalDataAnalysisService.fs), [Infra](https://github.com/oliviafroglin/FunctionalProgramming/blob/main/ArbitrageGainer/HistoricalDataAnalysisInfra.fs) \
-Test: [HistoricalDataAnalysisTests.fs](https://github.com/oliviafroglin/FunctionalProgramming/blob/main/ArbitrageGainer.Tests/HistoricalDataAnalysisTests.fs)
+    Path: [Core](https://github.com/oliviafroglin/FunctionalProgramming/blob/main/ArbitrageGainer/HistoricalDataAnalysisCore.fs), [Service](https://github.com/oliviafroglin/FunctionalProgramming/blob/main/ArbitrageGainer/HistoricalDataAnalysisService.fs), [Infra](https://github.com/oliviafroglin/FunctionalProgramming/blob/main/ArbitrageGainer/HistoricalDataAnalysisInfra.fs) \
+    Test: [HistoricalDataAnalysisTests.fs](https://github.com/oliviafroglin/FunctionalProgramming/blob/main/ArbitrageGainer.Tests/HistoricalDataAnalysisTests.fs)
 
-#### 2. Identify Cross Traded Pairs
+2. Identify Cross Traded Pairs
 
-Path: [Core](https://github.com/oliviafroglin/FunctionalProgramming/blob/main/ArbitrageGainer/IdentifyCrossTradedPairsCore.fs), [Service](https://github.com/oliviafroglin/FunctionalProgramming/blob/main/ArbitrageGainer/IdentifyCrossTradedPairsService.fs), [Infra](https://github.com/oliviafroglin/FunctionalProgramming/blob/main/ArbitrageGainer/IdentifyCrossTradedPairsInfra.fs)
+    Path: [Core](https://github.com/oliviafroglin/FunctionalProgramming/blob/main/ArbitrageGainer/IdentifyCrossTradedPairsCore.fs), [Service](https://github.com/oliviafroglin/FunctionalProgramming/blob/main/ArbitrageGainer/IdentifyCrossTradedPairsService.fs), [Infra](https://github.com/oliviafroglin/FunctionalProgramming/blob/main/ArbitrageGainer/IdentifyCrossTradedPairsInfra.fs)
 
 
-#### 3. MarketDataRetrieval
+3. MarketDataRetrieval
 
-Path: [Core](https://github.com/oliviafroglin/FunctionalProgramming/blob/main/ArbitrageGainer/MarketDataRetrieval.fs), [Service](https://github.com/oliviafroglin/FunctionalProgramming/blob/main/ArbitrageGainer/ArbitrageService.fs), [Infra](https://github.com/oliviafroglin/FunctionalProgramming/blob/main/ArbitrageGainer/ArbitrageInfra.fs)
+    Path: [Core](https://github.com/oliviafroglin/FunctionalProgramming/blob/main/ArbitrageGainer/MarketDataRetrieval.fs), [Service](https://github.com/oliviafroglin/FunctionalProgramming/blob/main/ArbitrageGainer/ArbitrageService.fs), [Infra](https://github.com/oliviafroglin/FunctionalProgramming/blob/main/ArbitrageGainer/ArbitrageInfra.fs)
 
-#### 4. ArbitrageOpportunityIdentifier
+4. ArbitrageOpportunityIdentifier
 
-Path: [Core](https://github.com/oliviafroglin/FunctionalProgramming/blob/main/ArbitrageGainer/ArbitrageOpportunityIdentifier.fs), [Service](https://github.com/oliviafroglin/FunctionalProgramming/blob/main/ArbitrageGainer/ArbitrageService.fs), [Infra](https://github.com/oliviafroglin/FunctionalProgramming/blob/main/ArbitrageGainer/ArbitrageInfra.fs)
+    Path: [Core](https://github.com/oliviafroglin/FunctionalProgramming/blob/main/ArbitrageGainer/ArbitrageOpportunityIdentifier.fs), [Service](https://github.com/oliviafroglin/FunctionalProgramming/blob/main/ArbitrageGainer/ArbitrageService.fs), [Infra](https://github.com/oliviafroglin/FunctionalProgramming/blob/main/ArbitrageGainer/ArbitrageInfra.fs)
 
-#### 5. Order Execution
+5. Order Execution
 
-Path: [Infra](https://github.com/oliviafroglin/FunctionalProgramming/blob/main/ArbitrageGainer/OrderExecutionInfra.fs)
+    Path: [Infra](https://github.com/oliviafroglin/FunctionalProgramming/blob/main/ArbitrageGainer/OrderExecutionInfra.fs)
 
-#### 6. P & L Calculation
+6. P & L Calculation
 
-Path: [Core](https://github.com/oliviafroglin/FunctionalProgramming/blob/main/ArbitrageGainer/PnLCalculationCore.fs), [Service](https://github.com/oliviafroglin/FunctionalProgramming/blob/main/ArbitrageGainer/PnLCalculationService.fs), [Infra](https://github.com/oliviafroglin/FunctionalProgramming/blob/main/ArbitrageGainer/PnLCalculationInfra.fs) \
-Test: [PnLCalculationTests.fs](https://github.com/oliviafroglin/FunctionalProgramming/blob/main/ArbitrageGainer.Tests/PnLCalculationTests.fs)
+    Path: [Core](https://github.com/oliviafroglin/FunctionalProgramming/blob/main/ArbitrageGainer/PnLCalculationCore.fs), [Service](https://github.com/oliviafroglin/FunctionalProgramming/blob/main/ArbitrageGainer/PnLCalculationService.fs), [Infra](https://github.com/oliviafroglin/FunctionalProgramming/blob/main/ArbitrageGainer/PnLCalculationInfra.fs) \
+    Test: [PnLCalculationTests.fs](https://github.com/oliviafroglin/FunctionalProgramming/blob/main/ArbitrageGainer.Tests/PnLCalculationTests.fs)
 
-#### 7. P & L Threshold Management
+7. P & L Threshold Management
 
-Path: [Core](https://github.com/oliviafroglin/FunctionalProgramming/blob/main/ArbitrageGainer/ManagePnLThresholdCore.fs), [Service](https://github.com/oliviafroglin/FunctionalProgramming/blob/main/ArbitrageGainer/ManagePnLThresholdService.fs), [Infra](hhttps://github.com/oliviafroglin/FunctionalProgramming/blob/main/ArbitrageGainer/ManagePnLThresholdInfra.fs) 
-Test: [ManagePnLThresholdTests.fs](https://github.com/oliviafroglin/FunctionalProgramming/blob/main/ArbitrageGainer.Tests/ManagePnLThresholdTests.fs)
+    Path: [Core](https://github.com/oliviafroglin/FunctionalProgramming/blob/main/ArbitrageGainer/ManagePnLThresholdCore.fs), [Service](https://github.com/oliviafroglin/FunctionalProgramming/blob/main/ArbitrageGainer/ManagePnLThresholdService.fs), [Infra](hhttps://github.com/oliviafroglin/FunctionalProgramming/blob/main/ArbitrageGainer/ManagePnLThresholdInfra.fs) \
+    Test: [ManagePnLThresholdTests.fs](https://github.com/oliviafroglin/FunctionalProgramming/blob/main/ArbitrageGainer.Tests/ManagePnLThresholdTests.fs)
 
-#### 8. Annualized Return (on demand)
+8. Annualized Return (on demand)
 
-Path: [Core](https://github.com/oliviafroglin/FunctionalProgramming/blob/main/ArbitrageGainer/AnnualizedReturnCalculationCore.fs), [Infra](https://github.com/oliviafroglin/FunctionalProgramming/blob/main/ArbitrageGainer/AnnualizedReturnCalculationInfra.fs) \
-Test: [AnnualizedReturnCalculationTests.fs](https://github.com/oliviafroglin/FunctionalProgramming/blob/main/ArbitrageGainer.Tests/AnnualizedReturnCalculationTests.fs)
+    Path: [Core](https://github.com/oliviafroglin/FunctionalProgramming/blob/main/ArbitrageGainer/AnnualizedReturnCalculationCore.fs), [Infra](https://github.com/oliviafroglin/FunctionalProgramming/blob/main/ArbitrageGainer/AnnualizedReturnCalculationInfra.fs) \
+    Test: [AnnualizedReturnCalculationTests.fs](https://github.com/oliviafroglin/FunctionalProgramming/blob/main/ArbitrageGainer.Tests/AnnualizedReturnCalculationTests.fs)
 
 
 ## 2. Side Effects
@@ -76,8 +76,8 @@ ArbitrageGainer/HistoricalDataAnalysisCore.fs: defines F# modules and types for 
 
     [ArbitrageInfra](https://github.com/oliviafroglin/FunctionalProgramming/blob/main/ArbitrageGainer/ArbitrageInfra.fs)
 
-5. **P & L Calculation** \
-[Infra](https://github.com/oliviafroglin/FunctionalProgramming/blob/main/ArbitrageGainer/PnLCalculationInfra.fs) \
+5. **P & L Calculation** 
+* [Infra](https://github.com/oliviafroglin/FunctionalProgramming/blob/main/ArbitrageGainer/PnLCalculationInfra.fs) \
 Database Access: The function [fetchTransactions](https://github.com/oliviafroglin/FunctionalProgramming/blob/ca4d0ab69357a004a12a4da22510973659dd2ed9/ArbitrageGainer/PnLCalculationInfra.fs#L18) interacts with MySQL database. This interaction includes connecting to the database, executing a query, and reading results. \
 HTTP Context Manipulations: The [pnlHandler](https://github.com/oliviafroglin/FunctionalProgramming/blob/ca4d0ab69357a004a12a4da22510973659dd2ed9/ArbitrageGainer/PnLCalculationInfra.fs#L55) function modifies the HTTP context by setting response status codes and bodies based on the outcome of its operations.
 
@@ -89,21 +89,21 @@ Asynchronous Responses: When setting or getting thresholds[(here)](https://githu
 * [Infra](https://github.com/oliviafroglin/FunctionalProgramming/blob/main/ArbitrageGainer/ManagePnLThresholdInfra.fs) \
 HTTP Request Handling [(here)](https://github.com/oliviafroglin/FunctionalProgramming/blob/ca4d0ab69357a004a12a4da22510973659dd2ed9/ArbitrageGainer/ManagePnLThresholdInfra.fs#L30): processes HTTP requests and modifies the HTTP response based on the operations performed, such as updating or retrieving the threshold.
 
-7. **Annualized Return Calculation** \
-[Infra](https://github.com/oliviafroglin/FunctionalProgramming/blob/main/ArbitrageGainer/AnnualizedReturnCalculationInfra.fs) \
+7. **Annualized Return Calculation** 
+* [Infra](https://github.com/oliviafroglin/FunctionalProgramming/blob/main/ArbitrageGainer/AnnualizedReturnCalculationInfra.fs) \
 Database Access: The [fetchTransactionsForDay](https://github.com/oliviafroglin/FunctionalProgramming/blob/ca4d0ab69357a004a12a4da22510973659dd2ed9/ArbitrageGainer/AnnualizedReturnCalculationInfra.fs#L15) function connects to a database and reads data. \
 HTTP Response Handling: The [annualizedReturnHandler](https://github.com/oliviafroglin/FunctionalProgramming/blob/ca4d0ab69357a004a12a4da22510973659dd2ed9/ArbitrageGainer/AnnualizedReturnCalculationInfra.fs#L52) alters HTTP responses based on the computation outcomes and input validation, directly affecting the HTTP state transmitted to the client.
 
 ## 3. Error Handling
-1. **Market Data Retrieval** \
+1. **Market Data Retrieval** 
 * [Service](https://github.com/oliviafroglin/FunctionalProgramming/blob/main/ArbitrageGainer/ArbitrageService.fs) \
     tryParseQuote \
-    processQuotes \
+    processQuotes 
 * [ArbitrageInfra](https://github.com/oliviafroglin/FunctionalProgramming/blob/main/ArbitrageGainer/ArbitrageInfra.fs) \
-    fetchCrossAndHistPairs \
+    fetchCrossAndHistPairs 
     
 
-3. **Order Execution** \
+3. **Order Execution** 
     File:OrderExecutionInfra.fs: 
 
     executeTransaction - Manages the transaction execution process, handles responses, and updates profit or notifies of failure, encapsulating outcomes in a Result.
@@ -133,3 +133,15 @@ Divide by Zero: The [calculateAnnualizedReturn](https://github.com/oliviafroglin
 Input Validation: The [handler function](https://github.com/oliviafroglin/FunctionalProgramming/blob/ca4d0ab69357a004a12a4da22510973659dd2ed9/ArbitrageGainer/AnnualizedReturnCalculationInfra.fs#L65) validates the input date format and checks if the start date is in the future, responding with an HTTP 400 (Bad Request) if there are any issues.
 Generic Exception Handling [(here)](https://github.com/oliviafroglin/FunctionalProgramming/blob/9b658c91e2f830d74ec467011e9adc3e75459838/ArbitrageGainer/AnnualizedReturnCalculationInfra.fs#L53): employ a generic exception handler that catches all exceptions (including database connection error). 
 
+6. **Calculate historical spread (arbitrage opportunities)**
+    initializeDatabase \
+    saveOpportunitiesToDatabase\
+    [Infra](https://github.com/oliviafroglin/FunctionalProgramming/blob/main/ArbitrageGainer/HistoricalDataAnalysisInfra.fs)
+
+7. **Identify Cross Traded Pairs**
+    initializeDatabase \
+    saveOpportunitiesToDatabase\
+    fetchCurrencyPairsFromBitfinex\
+    fetchCurrencyPairsFromBitstamp\
+    fetchCurrencyPairsFromKraken\
+    [Infra](https://github.com/oliviafroglin/FunctionalProgramming/blob/main/ArbitrageGainer/IdentifyCrossTradedPairsInfra.fs)
