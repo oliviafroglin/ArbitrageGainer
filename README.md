@@ -133,12 +133,12 @@ Divide by Zero: The [calculateAnnualizedReturn](https://github.com/oliviafroglin
 Input Validation: The [handler function](https://github.com/oliviafroglin/FunctionalProgramming/blob/ca4d0ab69357a004a12a4da22510973659dd2ed9/ArbitrageGainer/AnnualizedReturnCalculationInfra.fs#L65) validates the input date format and checks if the start date is in the future, responding with an HTTP 400 (Bad Request) if there are any issues.
 Generic Exception Handling [(here)](https://github.com/oliviafroglin/FunctionalProgramming/blob/9b658c91e2f830d74ec467011e9adc3e75459838/ArbitrageGainer/AnnualizedReturnCalculationInfra.fs#L53): employ a generic exception handler that catches all exceptions (including database connection error). 
 
-6. **Calculate historical spread (arbitrage opportunities)**
+6. **Calculate historical spread (arbitrage opportunities)** \
     initializeDatabase \
     saveOpportunitiesToDatabase\
     [Infra](https://github.com/oliviafroglin/FunctionalProgramming/blob/main/ArbitrageGainer/HistoricalDataAnalysisInfra.fs)
 
-7. **Identify Cross Traded Pairs**
+7. **Identify Cross Traded Pairs** \
     initializeDatabase \
     saveOpportunitiesToDatabase\
     fetchCurrencyPairsFromBitfinex\
