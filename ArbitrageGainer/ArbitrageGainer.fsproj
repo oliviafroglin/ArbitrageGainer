@@ -24,6 +24,7 @@
     <Compile Include="ArbitrageService.fs" />
     <Compile Include="ArbitrageInfra.fs" />
     <Compile Include="OrderExecution.fs" />
+    <Compile Include="OrderExecutionInfra.fs" />
     <Compile Include="IdentifyCrossTradedPairsCore.fs" />
     <Compile Include="IdentifyCrossTradedPairsService.fs" />
     <Compile Include="IdentifyCrossTradedPairsInfra.fs" />
@@ -35,7 +36,6 @@
     <PackageReference Include="FSharp.Data.Npgsql" Version="2.1.0" />
     <PackageReference Include="MySql.Data" Version="8.3.0" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
-    <PackageReference Include="Npgsql" Version="8.0.2" />
     <PackageReference Include="Suave" Version="2.6.2" />
     <PackageReference Include="System.Net.Http.Json" Version="8.0.0" />
   </ItemGroup>
