@@ -1,4 +1,5 @@
 module ArbitrageInfra
+
 open System
 open System.Net
 open System.Net.WebSockets
@@ -13,6 +14,56 @@ open Suave.RequestErrors
 open FSharp.Data
 open ArbitrageService
 open ArbitrageModels
+open System.Globalization
+open MySql.Data.MySqlClient
+
+let connectionString = "Server=cmu-fp.mysql.database.azure.com;Database=team_database_schema;Uid=sqlserver;Pwd=-*lUp54$JMRku5Ay;SslMode=Required;"
+
+let fetchCrossAndHistPairs =
+    use connection = new MySqlConnection(connectionString)
+    connection.Open()
+
+    // Command Text for cross_traded_pairs table
+    let crossCommandText = "SELECT * FROM `cross_traded_pairs`;"
+    use crossCmd = new MySqlCommand(crossCommandText, connection)
+    use crossReader = crossCmd.ExecuteReader()
+
+    // A function to read and parse the cross-traded pairs from the database
+    let rec readCrossPairs acc =
+        match crossReader.Read() with
+        | true ->
+            let baseCurrency = crossReader.GetString(crossReader.GetOrdinal("BaseCurrency"))
+            let quoteCurrency = crossReader.GetString(crossReader.GetOrdinal("QuoteCurrency"))
+            let pair = sprintf "%s-%s" baseCurrency quoteCurrency
+            readCrossPairs (pair :: acc)
+        | false ->
+            List.rev acc
+
+    let crossPairs = readCrossPairs []
+
+    // Close the first reader
+    crossReader.Close()
+
+    // Command Text for historical_spread table
+    let historicalCommandText = "SELECT * FROM `historical_spread`;"
+    use histCmd = new MySqlCommand(historicalCommandText, connection)
+    use histReader = histCmd.ExecuteReader()
+
+    // A function to read and parse the historical spread data from the database
+    let rec readHistoricalPairs acc =
+        match histReader.Read() with
+        | true ->
+            let pair = histReader.GetString(histReader.GetOrdinal("Pair"))
+            let numberOfOpportunities = histReader.GetInt32(histReader.GetOrdinal("NumberOfOpportunities"))
+            readHistoricalPairs ((pair, numberOfOpportunities) :: acc)
+        | false ->
+            List.rev acc
+
+    let historicalPairs = readHistoricalPairs []
+
+    // Final result as a tuple of both lists
+    (crossPairs, historicalPairs)
+
 
 // A mailbox processor for the trading agent
 let tradingAgent = MailboxProcessor.Start(fun inbox ->
@@ -188,15 +239,10 @@ let startTrading (ctx : HttpContext) : Async<HttpContext option> =
         let uri = Uri("wss://socket.polygon.io/crypto")
         let apiKey = "phN6Q_809zxfkeZesjta_phpgQCMB2Dw"
 
-        //TODO: Retrieve historical and cross-traded crypto pairs from another domain
-        let historicalCryptoPairs = [
-            ("BTC-USD", 30); ("CHZ-USD", 22); ("KNC-USD", 15);
-            ("YFI-USD", 12); ("CRV-USD", 10); ("FTM-USD", 8);
-            ("ZRX-USD", 5); ("BAT-USD", 4); ("ADA-USD", 2); ("SOL-USD", 1)
-        ]
-        let crossTradedCryptoPairs = [
-            "BTC-USD"; "KNC-USD"; "YFI-USD"; "ZRX-USD"; "DOG-USD"; "SOL-USD"; "ADA-USD"
-        ]
+        let (crossTradedCryptoPairs, historicalCryptoPairs) = fetchCrossAndHistPairs
+        printfn "Historical Crypto Pairs: %A" historicalCryptoPairs
+        printfn "Cross-Traded Crypto Pairs: %A" crossTradedCryptoPairs
+
         let config = configAgent.PostAndReply(GetConfig)
         let (numSubscriptions, _, _, _, _) = config
         let subscriptionParameters = getCryptoSubscriptions numSubscriptions historicalCryptoPairs crossTradedCryptoPairs

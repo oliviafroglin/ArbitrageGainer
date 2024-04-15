@@ -1,20 +1,20 @@
 {
   "format": 1,
   "restore": {
-    "/Users/olivia/Desktop/FunctionalProgramming/ArbitrageGainer.Tests/ArbitrageGainer.Tests.fsproj": {}
+    "/Users/haimingchen/Desktop/functional_prog/Arbitrage Project/FunctionalProgramming/ArbitrageGainer.Tests/ArbitrageGainer.Tests.fsproj": {}
   },
   "projects": {
-    "/Users/olivia/Desktop/FunctionalProgramming/ArbitrageGainer.Tests/ArbitrageGainer.Tests.fsproj": {
+    "/Users/haimingchen/Desktop/functional_prog/Arbitrage Project/FunctionalProgramming/ArbitrageGainer.Tests/ArbitrageGainer.Tests.fsproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "/Users/olivia/Desktop/FunctionalProgramming/ArbitrageGainer.Tests/ArbitrageGainer.Tests.fsproj",
+        "projectUniqueName": "/Users/haimingchen/Desktop/functional_prog/Arbitrage Project/FunctionalProgramming/ArbitrageGainer.Tests/ArbitrageGainer.Tests.fsproj",
         "projectName": "ArbitrageGainer.Tests",
-        "projectPath": "/Users/olivia/Desktop/FunctionalProgramming/ArbitrageGainer.Tests/ArbitrageGainer.Tests.fsproj",
-        "packagesPath": "/Users/olivia/.nuget/packages/",
-        "outputPath": "/Users/olivia/Desktop/FunctionalProgramming/ArbitrageGainer.Tests/obj/",
+        "projectPath": "/Users/haimingchen/Desktop/functional_prog/Arbitrage Project/FunctionalProgramming/ArbitrageGainer.Tests/ArbitrageGainer.Tests.fsproj",
+        "packagesPath": "/Users/haimingchen/.nuget/packages/",
+        "outputPath": "/Users/haimingchen/Desktop/functional_prog/Arbitrage Project/FunctionalProgramming/ArbitrageGainer.Tests/obj/",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "/Users/olivia/.nuget/NuGet/NuGet.Config"
+          "/Users/haimingchen/.nuget/NuGet/NuGet.Config"
         ],
         "originalTargetFrameworks": [
           "net6.0"
@@ -27,8 +27,8 @@
           "net6.0": {
             "targetAlias": "net6.0",
             "projectReferences": {
-              "/Users/olivia/Desktop/FunctionalProgramming/ArbitrageGainer/ArbitrageGainer.fsproj": {
-                "projectPath": "/Users/olivia/Desktop/FunctionalProgramming/ArbitrageGainer/ArbitrageGainer.fsproj"
+              "/Users/haimingchen/Desktop/functional_prog/Arbitrage Project/FunctionalProgramming/ArbitrageGainer/ArbitrageGainer.fsproj": {
+                "projectPath": "/Users/haimingchen/Desktop/functional_prog/Arbitrage Project/FunctionalProgramming/ArbitrageGainer/ArbitrageGainer.fsproj"
               }
             }
           }
@@ -42,6 +42,11 @@
               "include": "Runtime, Compile, Build, Native, Analyzers, BuildTransitive",
               "target": "Package",
               "version": "[6.0.7, )",
+              "generatePathProperty": true
+            },
+            "FSharp.Data": {
+              "target": "Package",
+              "version": "[6.4.0, )",
               "generatePathProperty": true
             },
             "Microsoft.NET.Test.Sdk": {
@@ -62,6 +67,21 @@
             "NUnit3TestAdapter": {
               "target": "Package",
               "version": "[4.2.1, )",
+              "generatePathProperty": true
+            },
+            "Newtonsoft.Json": {
+              "target": "Package",
+              "version": "[13.0.3, )",
+              "generatePathProperty": true
+            },
+            "Suave": {
+              "target": "Package",
+              "version": "[2.6.2, )",
+              "generatePathProperty": true
+            },
+            "System.Net.Http.Json": {
+              "target": "Package",
+              "version": "[8.0.0, )",
               "generatePathProperty": true
             },
             "coverlet.collector": {
@@ -90,17 +110,17 @@
         }
       }
     },
-    "/Users/olivia/Desktop/FunctionalProgramming/ArbitrageGainer/ArbitrageGainer.fsproj": {
+    "/Users/haimingchen/Desktop/functional_prog/Arbitrage Project/FunctionalProgramming/ArbitrageGainer/ArbitrageGainer.fsproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "/Users/olivia/Desktop/FunctionalProgramming/ArbitrageGainer/ArbitrageGainer.fsproj",
+        "projectUniqueName": "/Users/haimingchen/Desktop/functional_prog/Arbitrage Project/FunctionalProgramming/ArbitrageGainer/ArbitrageGainer.fsproj",
         "projectName": "ArbitrageGainer",
-        "projectPath": "/Users/olivia/Desktop/FunctionalProgramming/ArbitrageGainer/ArbitrageGainer.fsproj",
-        "packagesPath": "/Users/olivia/.nuget/packages/",
-        "outputPath": "/Users/olivia/Desktop/FunctionalProgramming/ArbitrageGainer/obj/",
+        "projectPath": "/Users/haimingchen/Desktop/functional_prog/Arbitrage Project/FunctionalProgramming/ArbitrageGainer/ArbitrageGainer.fsproj",
+        "packagesPath": "/Users/haimingchen/.nuget/packages/",
+        "outputPath": "/Users/haimingchen/Desktop/functional_prog/Arbitrage Project/FunctionalProgramming/ArbitrageGainer/obj/",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "/Users/olivia/.nuget/NuGet/NuGet.Config"
+          "/Users/haimingchen/.nuget/NuGet/NuGet.Config"
         ],
         "originalTargetFrameworks": [
           "net6.0"
@@ -126,9 +146,34 @@
               "version": "[6.0.7, )",
               "generatePathProperty": true
             },
+            "FSharp.Data": {
+              "target": "Package",
+              "version": "[6.4.0, )",
+              "generatePathProperty": true
+            },
+            "FSharp.Data.Npgsql": {
+              "target": "Package",
+              "version": "[2.1.0, )",
+              "generatePathProperty": true
+            },
+            "MySql.Data": {
+              "target": "Package",
+              "version": "[8.3.0, )",
+              "generatePathProperty": true
+            },
             "Newtonsoft.Json": {
               "target": "Package",
               "version": "[13.0.3, )",
+              "generatePathProperty": true
+            },
+            "Suave": {
+              "target": "Package",
+              "version": "[2.6.2, )",
+              "generatePathProperty": true
+            },
+            "System.Net.Http.Json": {
+              "target": "Package",
+              "version": "[8.0.0, )",
               "generatePathProperty": true
             }
           },

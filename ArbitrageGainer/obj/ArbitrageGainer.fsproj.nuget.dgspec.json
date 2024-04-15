@@ -45,6 +45,16 @@
               "version": "[6.4.0, )",
               "generatePathProperty": true
             },
+            "FSharp.Data.Npgsql": {
+              "target": "Package",
+              "version": "[2.1.0, )",
+              "generatePathProperty": true
+            },
+            "MySql.Data": {
+              "target": "Package",
+              "version": "[8.3.0, )",
+              "generatePathProperty": true
+            },
             "Newtonsoft.Json": {
               "target": "Package",
               "version": "[13.0.3, )",

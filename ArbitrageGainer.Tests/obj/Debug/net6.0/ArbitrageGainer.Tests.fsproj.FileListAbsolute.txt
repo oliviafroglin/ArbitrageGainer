@@ -1,3 +1,6 @@
 /Users/olivia/Desktop/FunctionalProgramming/ArbitrageGainer.Tests/bin/Debug/net6.0/CoverletSourceRootsMapping_ArbitrageGainer.Tests
 /Users/olivia/Desktop/FunctionalProgramming/ArbitrageGainer.Tests/obj/Debug/net6.0/ArbitrageGainer.Tests.AssemblyInfoInputs.cache
 /Users/olivia/Desktop/FunctionalProgramming/ArbitrageGainer.Tests/obj/Debug/net6.0/ArbitrageGainer.Tests.AssemblyInfo.fs
+/Users/haimingchen/Desktop/functional_prog/Arbitrage Project/FunctionalProgramming/ArbitrageGainer.Tests/bin/Debug/net6.0/CoverletSourceRootsMapping_ArbitrageGainer.Tests
+/Users/haimingchen/Desktop/functional_prog/Arbitrage Project/FunctionalProgramming/ArbitrageGainer.Tests/obj/Debug/net6.0/ArbitrageGainer.Tests.AssemblyInfoInputs.cache
+/Users/haimingchen/Desktop/functional_prog/Arbitrage Project/FunctionalProgramming/ArbitrageGainer.Tests/obj/Debug/net6.0/ArbitrageGainer.Tests.AssemblyInfo.fs
