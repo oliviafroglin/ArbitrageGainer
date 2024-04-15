@@ -11,6 +11,7 @@ open IdentifyCrossTradedPairsInfra
 open ManagePnLThresholdInfra
 open PnLCalculationInfra
 open AnnualizedReturnCalculationInfra
+open OrderExecutionInfra
 
 let app : WebPart =
     choose [
@@ -19,6 +20,7 @@ let app : WebPart =
             path "/start-trading" >=> startTrading
             path "/stop-trading" >=> stopTrading
             path "/pnl/threshold" >=> updateThresholdHandler
+            path "/email" >=> updateEmail // for sending email in order execution
         ]
         GET >=> choose [
             path "/get-historical-data" >=> (fun (ctx: HttpContext) ->

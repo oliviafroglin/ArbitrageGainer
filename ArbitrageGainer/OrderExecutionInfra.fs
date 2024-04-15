@@ -4,6 +4,12 @@ open System.Net.Mail
 open System.Threading
 open MySql.Data.MySqlClient
 
+open Suave
+open Suave.Filters
+open Suave.Operators
+open Suave.Successful
+open Suave.RequestErrors
+
 // open ManagePnLThresholdInfra
 // open PnLCalculationCore
 // open PnLCalculationService
@@ -13,11 +19,6 @@ type Exchange = Kraken | Bitstamp | Bitfinex
 type CryptoCurrencyPair = string
 
 type UserDefinedParameters = {
-    MinimalPriceSpreadValue: decimal
-    MinimalTransactionProfit: decimal
-    MaximalTransactionValue: decimal
-    MaximalTradingValue: decimal
-    EmailForNotification: string
     ProfitThreshold: decimal option
 }
 
@@ -84,6 +85,27 @@ let profitAgent = MailboxProcessor.Start(fun inbox ->
     // Initially, total profit is set to zero
     loop 0m
 )
+
+type EmailMessage =
+    | GetEmail of AsyncReplyChannel<string>
+    | SetEmail of string
+
+let emailAgent = MailboxProcessor.Start(fun inbox ->
+    let rec loop email =
+        async {
+            let! message = inbox.Receive()
+            match message with
+            | GetEmail replyChannel ->
+                replyChannel.Reply(email)
+                return! loop email
+            | SetEmail newEmail ->
+                printfn "Email updated to: %s" newEmail
+                return! loop newEmail
+        }
+    loop ""
+    // for testing, can do: loop "xiaojun3@andrew.cmu", will be integrated to use next milestone
+)
+
 // profitAgent.Post(SetProfit 1000m)
 // let profit = profitAgent.PostAndReply(GetProfit)
 let sendEmail (toAddress: string) (subject: string) (body: string) : Result<unit, string> =
@@ -123,7 +145,8 @@ let updateProfitAndCheckThreshold userParams =
     | Some threshold when totalProfit >= threshold ->
         // Notify the user if the profit threshold has been exceeded
         printfn "Threshold met or exceeded. Triggering email notification."
-        notifyUser userParams.EmailForNotification "Your Arbitrage Gainer" ("Profit threshold reached: " + string totalProfit)
+        let emailUser = emailAgent.PostAndReply(GetEmail)
+        notifyUser emailUser "Your Arbitrage Gainer" ("Profit threshold reached: " + string totalProfit)
         () 
     | _ ->
         // Log the current total profit for information
@@ -246,7 +269,8 @@ let executeTransaction direction opportunity userParams remainingAmount initialP
         profitAgent.Post(SetProfit (initialProfit + profitUpdate))
         initialProfit + profitUpdate
     | Failure error ->
-        notifyUser userParams.EmailForNotification "Transaction Failure" error
+        let emailUser2 = emailAgent.PostAndReply(GetEmail)
+        notifyUser emailUser2 "Transaction Failure" error
         initialProfit
 
 // Main function to handle both buy and sell transactions.
@@ -260,29 +284,43 @@ let simulateOrderExecution (opportunity: ArbitrageOpportunity) (userParams: User
     // After processing both transactions, check if the total profit meets the threshold.
     updateProfitAndCheckThreshold userParams
 
-[<EntryPoint>]
-let main argv =
 
-    printfn "Starting order execution..."
-    // notifyUser "xiaojun3@andrew.cmu.edu" "Test Email" "This is a test email."
+let updateEmail (ctx: HttpContext): Async<HttpContext option> =
+    match ctx.request.query |> List.tryFind (fun (key, _) -> key = "email") with
+    | Some (_, Some(email)) ->
+        do emailAgent.Post (SetEmail email)  // This should return Async<unit>
+        ctx |> OK ("Email updated")  // Wrap in Async
+    | _ ->
+        ctx |> BAD_REQUEST ("Email key not found or no value provided")  // Handle other cases
 
-    let userParams = {
-        MinimalPriceSpreadValue = 10m
-        MinimalTransactionProfit = 20m
-        MaximalTransactionValue = 1000000m
-        MaximalTradingValue = 10000000m
-        EmailForNotification = "xiaojun3@andrew.cmu.edu"
-        ProfitThreshold = Some 1000m
-    }
 
-    let opportunities = [
-        { CryptoCurrencyPair = "BTC-USD"; ExchangeToBuyFrom = Kraken; ExchangeToSellTo = Kraken; BuyPrice = 33000m; BuyQuantity = 1m; SellPrice = 34000m; SellQuantity = 1m }
-        { CryptoCurrencyPair = "ETH-USD"; ExchangeToBuyFrom = Kraken; ExchangeToSellTo = Kraken; BuyPrice = 2500m; BuyQuantity = 5m; SellPrice = 2600m; SellQuantity = 5m }
-        { CryptoCurrencyPair = "LTC-USD"; ExchangeToBuyFrom = Kraken; ExchangeToSellTo = Kraken; BuyPrice = 140m; BuyQuantity = 10m; SellPrice = 150m; SellQuantity = 10m }
-        { CryptoCurrencyPair = "LTC-USD"; ExchangeToBuyFrom = Kraken; ExchangeToSellTo = Kraken; BuyPrice = 33000m; BuyQuantity = 1m; SellPrice = 35000m; SellQuantity = 1m }
-    ]   
+// below is commented out, can be commented in for testing reasons: 
+// let app : WebPart =
+//     choose [
+//         POST >=> path "/email" >=> updateEmail
+//     ]
 
-    for opportunity in opportunities do
-        simulateOrderExecution opportunity userParams
 
-    0
+// [<EntryPoint>]
+// let main argv =
+
+//     printfn "Starting order execution..."
+//     // notifyUser "xiaojun3@andrew.cmu.edu" "Test Email" "This is a test email."
+
+//     let userParams = {
+//         ProfitThreshold = Some 1000m 
+//     }
+
+//     let opportunities = [
+//         { CryptoCurrencyPair = "BTC-USD"; ExchangeToBuyFrom = Kraken; ExchangeToSellTo = Kraken; BuyPrice = 33000m; BuyQuantity = 1m; SellPrice = 34000m; SellQuantity = 1m }
+//         { CryptoCurrencyPair = "ETH-USD"; ExchangeToBuyFrom = Kraken; ExchangeToSellTo = Kraken; BuyPrice = 2500m; BuyQuantity = 5m; SellPrice = 2600m; SellQuantity = 5m }
+//         { CryptoCurrencyPair = "LTC-USD"; ExchangeToBuyFrom = Kraken; ExchangeToSellTo = Kraken; BuyPrice = 140m; BuyQuantity = 10m; SellPrice = 150m; SellQuantity = 10m }
+//         { CryptoCurrencyPair = "LTC-USD"; ExchangeToBuyFrom = Kraken; ExchangeToSellTo = Kraken; BuyPrice = 33000m; BuyQuantity = 1m; SellPrice = 35000m; SellQuantity = 1m }
+//     ]   
+
+//     for opportunity in opportunities do
+//         simulateOrderExecution opportunity userParams
+
+//     startWebServer defaultConfig app // start the web server
+
+//     0
