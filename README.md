@@ -89,15 +89,3 @@ Divide by Zero: The [calculateAnnualizedReturn](https://github.com/oliviafroglin
 * [Infra](https://github.com/oliviafroglin/FunctionalProgramming/blob/main/ArbitrageGainer/AnnualizedReturnCalculationInfra.fs) \
 Input Validation: The [handler function](https://github.com/oliviafroglin/FunctionalProgramming/blob/ca4d0ab69357a004a12a4da22510973659dd2ed9/ArbitrageGainer/AnnualizedReturnCalculationInfra.fs#L65) validates the input date format and checks if the start date is in the future, responding with an HTTP 400 (Bad Request) if there are any issues.
 
-
-Path: [Core](https://github.com/oliviafroglin/FunctionalProgramming/blob/main/ArbitrageGainer/PnLCalculationCore.fs), [Service](https://github.com/oliviafroglin/FunctionalProgramming/blob/updateReadMePnL/ArbitrageGainer/PnLCalculationService.fs), [Infra](https://github.com/oliviafroglin/FunctionalProgramming/blob/updateReadMePnL/ArbitrageGainer/PnLCalculationInfra.fs) \
-Test: [PnLCalculationTests.fs](https://github.com/oliviafroglin/FunctionalProgramming/blob/updateReadMePnL/ArbitrageGainer.Tests/PnLCalculationTests.fs)
-
-#### 7. P & L Threshold Management
-
-Path: [Core](https://github.com/oliviafroglin/FunctionalProgramming/blob/updateReadMePnL/ArbitrageGainer/ManagePnLThresholdCore.fs), [Service](https://github.com/oliviafroglin/FunctionalProgramming/blob/updateReadMePnL/ArbitrageGainer/ManagePnLThresholdService.fs), [Infra](https://github.com/oliviafroglin/FunctionalProgramming/blob/updateReadMePnL/ArbitrageGainer/ManagePnLThresholdInfra.fs) 
-
-#### 8. Annualized Return (on demand)
-
-Path: [Core](https://github.com/oliviafroglin/FunctionalProgramming/blob/updateReadMePnL/ArbitrageGainer/AnnualizedReturnCalculationCore.fs), [Infra](https://github.com/oliviafroglin/FunctionalProgramming/blob/updateReadMePnL/ArbitrageGainer/AnnualizedReturnCalculationInfra.fs) \
-Test: [AnnualizedReturnCalculationTests.fs](https://github.com/oliviafroglin/FunctionalProgramming/blob/updateReadMePnL/ArbitrageGainer.Tests/AnnualizedReturnCalculationTests.fs)
