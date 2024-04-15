@@ -20,49 +20,55 @@ open MySql.Data.MySqlClient
 let connectionString = "Server=cmu-fp.mysql.database.azure.com;Database=team_database_schema;Uid=sqlserver;Pwd=-*lUp54$JMRku5Ay;SslMode=Required;"
 
 let fetchCrossAndHistPairs =
-    use connection = new MySqlConnection(connectionString)
-    connection.Open()
+    try
+        use connection = new MySqlConnection(connectionString)
+        connection.Open()
 
-    // Command Text for cross_traded_pairs table
-    let crossCommandText = "SELECT * FROM `cross_traded_pairs`;"
-    use crossCmd = new MySqlCommand(crossCommandText, connection)
-    use crossReader = crossCmd.ExecuteReader()
+        // Command Text for cross_traded_pairs table
+        let crossCommandText = "SELECT * FROM `cross_traded_pairs`;"
+        use crossCmd = new MySqlCommand(crossCommandText, connection)
+        use crossReader = crossCmd.ExecuteReader()
 
-    // A function to read and parse the cross-traded pairs from the database
-    let rec readCrossPairs acc =
-        match crossReader.Read() with
-        | true ->
-            let baseCurrency = crossReader.GetString(crossReader.GetOrdinal("BaseCurrency"))
-            let quoteCurrency = crossReader.GetString(crossReader.GetOrdinal("QuoteCurrency"))
-            let pair = sprintf "%s-%s" baseCurrency quoteCurrency
-            readCrossPairs (pair :: acc)
-        | false ->
-            List.rev acc
+        // A function to read and parse the cross-traded pairs from the database
+        let rec readCrossPairs acc =
+            match crossReader.Read() with
+            | true ->
+                let baseCurrency = crossReader.GetString(crossReader.GetOrdinal("BaseCurrency"))
+                let quoteCurrency = crossReader.GetString(crossReader.GetOrdinal("QuoteCurrency"))
+                let pair = sprintf "%s-%s" baseCurrency quoteCurrency
+                readCrossPairs (pair :: acc)
+            | false ->
+                List.rev acc
 
-    let crossPairs = readCrossPairs []
+        let crossPairs = readCrossPairs []
 
-    // Close the first reader
-    crossReader.Close()
+        // Close the first reader
+        crossReader.Close()
 
-    // Command Text for historical_spread table
-    let historicalCommandText = "SELECT * FROM `historical_spread`;"
-    use histCmd = new MySqlCommand(historicalCommandText, connection)
-    use histReader = histCmd.ExecuteReader()
+        // Command Text for historical_spread table
+        let historicalCommandText = "SELECT * FROM `historical_spread`;"
+        use histCmd = new MySqlCommand(historicalCommandText, connection)
+        use histReader = histCmd.ExecuteReader()
 
-    // A function to read and parse the historical spread data from the database
-    let rec readHistoricalPairs acc =
-        match histReader.Read() with
-        | true ->
-            let pair = histReader.GetString(histReader.GetOrdinal("Pair"))
-            let numberOfOpportunities = histReader.GetInt32(histReader.GetOrdinal("NumberOfOpportunities"))
-            readHistoricalPairs ((pair, numberOfOpportunities) :: acc)
-        | false ->
-            List.rev acc
+        // A function to read and parse the historical spread data from the database
+        let rec readHistoricalPairs acc =
+            match histReader.Read() with
+            | true ->
+                let pair = histReader.GetString(histReader.GetOrdinal("Pair"))
+                let numberOfOpportunities = histReader.GetInt32(histReader.GetOrdinal("NumberOfOpportunities"))
+                readHistoricalPairs ((pair, numberOfOpportunities) :: acc)
+            | false ->
+                List.rev acc
 
-    let historicalPairs = readHistoricalPairs []
+        let historicalPairs = readHistoricalPairs []
 
-    // Final result as a tuple of both lists
-    (crossPairs, historicalPairs)
+        // Final result as a tuple of both lists
+        (crossPairs, historicalPairs)
+    with
+    | ex -> 
+        // Return empty lists if an error occurs
+        printfn "Database error: %s" ex.Message
+        ([], [])
 
 
 // A mailbox processor for the trading agent
