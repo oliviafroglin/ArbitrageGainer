@@ -8,6 +8,7 @@ open ManagePnLThresholdInfra
 open PnLCalculationInfra
 open AnnualizedReturnCalculationInfra
 open OrderExecutionInfra
+open IdentifyCrossTradedPairsInfra
 
 
 let app : WebPart =
@@ -25,12 +26,7 @@ let app : WebPart =
                     let opportunities = HistoricalDataAnalysisInfra.getHistoricalSpread()
                     return! Successful.OK (JsonConvert.SerializeObject(opportunities)) ctx
                 })
-            path "/get-cross-traded-pairs" >=> (fun (ctx: HttpContext) ->
-                async {
-                    let task = IdentifyCrossTradedPairsInfra.identifyCrossTradedPairs () |> Async.StartAsTask
-                    let json = JsonConvert.SerializeObject(task.Result)
-                    return! Successful.OK json ctx
-                })
+            path "/get-cross-traded-pairs" >=> identifyCrossTradedPairsHandler
             path "/pnl/historical" >=> pnlHandler
             path "/annualized-return" >=> annualizedReturnHandler
         ]
