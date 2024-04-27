@@ -6,6 +6,7 @@ open MySql.Data.MySqlClient
 open HistoricalDataAnalysisCore
 open HistoricalDataAnalysisService
 open System
+open Logging.Logger
 
 // Define Errors.
 type DatabaseError =
@@ -66,9 +67,18 @@ let printArbitrageOpportunities (opportunities: ArbitrageOpportunity list) =
 
 // Reads market data from a file, identifies arbitrage opportunities, saves them to a database, and writes them to a file.
 let getHistoricalSpread () = 
+
+    let logger = createLogger
+    logger "Starting Historical Arbitrage Analysis"
+    let startTime = DateTime.Now
+
     let filePath = "../historicalData.txt"
     let marketData = readMarketDataFromFile filePath
     let opportunities = identifyArbitrageOpportunities marketData
+
+    let endTime = DateTime.Now
+    logger (sprintf "Historical Arbitrage Analysis completed in %A seconds" (endTime - startTime))
+
     printArbitrageOpportunities opportunities
     match initializeDatabase () with
     | Ok _ -> 

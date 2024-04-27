@@ -19,6 +19,8 @@ open Suave.Writers
 open Newtonsoft.Json
 open System.Globalization
 
+open Logging.Logger
+
 // Define Errors.
 type DatabaseError =
     | ConnectionFailed of Exception
@@ -37,7 +39,7 @@ let fetchCurrencyPairsFromBitfinex () =
         try
             let url = "https://api-pub.bitfinex.com/v2/conf/pub:list:pair:exchange"
             let! response = httpClient.GetAsync(url) |> Async.AwaitTask
-            printfn "Response: %A" response
+            // printfn "Response: %A" response
             match response.IsSuccessStatusCode with
             | false -> return Error (HttpError response.ReasonPhrase)
             | true ->
@@ -65,7 +67,7 @@ let fetchCurrencyPairsFromBitstamp () =
         try
             let url = "https://www.bitstamp.net/api/v2/ticker/"
             let! response = httpClient.GetAsync(url) |> Async.AwaitTask
-            printfn "Response: %A" response
+            // printfn "Response: %A" response
             match response.IsSuccessStatusCode with
             | false -> return Error (HttpError response.ReasonPhrase)
             | true ->
@@ -86,7 +88,7 @@ let fetchCurrencyPairsFromKraken () =
         try
             let url = "https://api.kraken.com/0/public/AssetPairs"
             let! response = httpClient.GetAsync(url) |> Async.AwaitTask
-            printfn "Response: %A" response
+            // printfn "Response: %A" response
             match response.IsSuccessStatusCode with
             | false -> return Error (HttpError response.ReasonPhrase)
             | true ->
@@ -142,7 +144,13 @@ let savePairsToDatabase (pairs: (string * string) list) =
 
 // Identifies cross-traded pairs by fetching currency pairs from Bitfinex, Bitstamp, and Kraken.
 let identifyCrossTradedPairs () =
+    let logger = createLogger
+
     async {
+
+        logger "Starting Identify Cross-Traded Pairs"
+        let startTime = DateTime.Now
+
         let! bitfinexResult = fetchCurrencyPairsFromBitfinex ()
         let! bitstampResult = fetchCurrencyPairsFromBitstamp ()
         let! krakenResult = fetchCurrencyPairsFromKraken ()
@@ -159,11 +167,14 @@ let identifyCrossTradedPairs () =
             
             let crossTradedPairs = IdentifyCrossTradedPairsService(bitfinexSet1, bitstampSet1, krakenSet1)
 
+            let endTime = DateTime.Now
+            logger (sprintf "Identify Cross-Traded Pairs completed in %A seconds" (endTime - startTime))
+
             match initializeDatabase (), savePairsToDatabase (Set.toList crossTradedPairs) with
             | Ok (), Ok () ->
-                printfn "Stored cross-traded pairs: %A" crossTradedPairs
+                // printfn "Stored cross-traded pairs: %A" crossTradedPairs
                 let crossTradedPairsList = Set.toList crossTradedPairs
-                crossTradedPairsList |> List.iter (fun (b, quote) -> printfn "Base: %s, Quote: %s" b quote)
+                // crossTradedPairsList |> List.iter (fun (b, quote) -> printfn "Base: %s, Quote: %s" b quote)
                 return Ok (crossTradedPairsList)
             | Error e, _ -> return Error (sprintf "Failed to initialize database: %A" e)
             | _, Error e -> return Error (sprintf "Failed to save data: %A" e)
