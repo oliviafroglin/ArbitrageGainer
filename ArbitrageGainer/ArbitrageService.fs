@@ -87,7 +87,6 @@ let processQuotes (cache: (string * int * Quote) list) (jsonString: string) (con
     jsonStrings |> List.fold (fun (currentCache) jsonString ->
         match tryParseQuote jsonString with
         | Success quote ->
-            printfn "Quote: %A" quote
             // retrieve the current accumulated trading value
             let currentAccVal = tradingValueAgent.PostAndReply GetTradingValue 
             // Update the market data cache with the latest quote and identify any arbitrage opportunities
