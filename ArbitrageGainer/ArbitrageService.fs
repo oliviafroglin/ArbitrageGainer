@@ -7,7 +7,22 @@ open ArbitrageOpportunityIdentifier
 open ArbitrageModels
 
 // Define a type provider for the market data JSON schema
-type MarketData = JsonProvider<"""{"ev":"Q","sym":"MSFT","bx":4,"bp":114.125,"bs":100,"ax":7,"ap":114.128,"as":160,"c":0,"i":[604],"t":1536036818784,"q":50385480,"z":3}""">
+type MarketData = JsonProvider<"""{"ev":"XQ","pair":"DOT-USD","lp":0,"ls":0,"bp":6.7818,"bs":14.22,"ap":6.7819,"as":385.28012,"t":1714260364410,"x":23,"r":1714260364453}""">
+
+// A mailbox processor for the accumulated trading value agent
+let tradingValueAgent = MailboxProcessor.Start(fun inbox ->
+    let rec loop tradingValue =
+        async {
+            let! message = inbox.Receive()
+            match message with
+            | UpdateTradingValue newTradingValue ->
+                return! loop newTradingValue
+            | GetTradingValue replyChannel ->
+                replyChannel.Reply tradingValue
+                return! loop tradingValue
+        }
+    loop 0M
+)
 
 // Service function to get a list of cryptocurrencies to subscribe to based on the number of cryptocurrencies to subscribe to, historical pairs, and cross-traded pairs
 let getCryptoSubscriptions (numOfCryptoToSub: int) (historicalCryptoPairs: (string * int) list) (crossTradedCryptoPairs: string list) =
@@ -15,15 +30,15 @@ let getCryptoSubscriptions (numOfCryptoToSub: int) (historicalCryptoPairs: (stri
     selectedPairs
     // Convert the selected pairs to a list of strings in the format "Q.<CryptoPair>" and concatenate them with a comma
     |> List.map fst
-    |> List.map (fun pair -> "Q." + pair)
+    |> List.map (fun pair -> "XQ." + pair)
     |> String.concat ","
 
 // Service function to split a JSON string into a list of JSON objects
 let splitJsonObjects (jsonString: string): string list =
         // Trim the JSON string to remove the outermost curly braces and square brackets
-        let jsonStringTrimmed = jsonString.TrimStart('{').TrimEnd('}').TrimStart('[').TrimEnd(']')
+        let jsonStringTrimmed = jsonString.TrimStart('[').TrimEnd(']').TrimStart('{').TrimEnd('}')
         // Split the JSON string by the "},{" delimiter
-        jsonStringTrimmed.Split("],[")
+        jsonStringTrimmed.Split("},{")
         // Add the outermost curly braces to each JSON object
         |> Array.map (fun str -> sprintf "{%s}" str)
         |> List.ofArray
@@ -34,12 +49,12 @@ let tryParseQuote (message: string) : Result<Quote, string> =
         let data = MarketData.Parse(message)
         // Create a Quote object from the parsed JSON data
         Success {
-            CryptoPair = data.Sym
+            CryptoPair = data.Pair
             BidPrice = data.Bp
             AskPrice = data.Ap
             BidQuantity = decimal data.Bs
             AskQuantity = decimal data.``As``
-            ExchangeId = data.Bx
+            ExchangeId = data.X
         }
     with
     // Handle any exceptions that occur during parsing
@@ -54,9 +69,9 @@ let updateAndProcessQuote (cache: (string * int * Quote) list) (quote: Quote) (c
         let updatedCache = updateMarketDataCache cache quote
         // Identify any arbitrage opportunities based on the updated cache, quote, and trading configuration
         let newAccTradingValue, opportunity = identifyArbitrageOpportunity updatedCache quote config.MinimalPriceSpread config.MinimalProfit config.MaximalTotalTransactionValue config.MaximalTradingValue accumulatedTradingValue
-        printfn "Updated market data cache: %A" updatedCache
-        printfn "Accumulated trading value: %M" newAccTradingValue
-        printfn "Opportunity: %A" opportunity
+        // printfn "Updated market data cache: %A" updatedCache
+        // printfn "Accumulated trading value: %M" newAccTradingValue
+        // printfn "Opportunity: %A" opportunity
         (updatedCache, newAccTradingValue, opportunity)
     | false ->
         printfn "Quote from exchange ID %d ignored" quote.ExchangeId
@@ -64,21 +79,59 @@ let updateAndProcessQuote (cache: (string * int * Quote) list) (quote: Quote) (c
 
 
 // Service function to process a list of JSON strings containing market data quotes    
-let processQuotes (cache: (string * int * Quote) list) (jsonString: string) (config: TradingConfig) (accumulatedTradingValue: decimal)=
+let processQuotes (cache: (string * int * Quote) list) (jsonString: string) (config: TradingConfig) =
     // Split the JSON string into a list of JSON objects
+
     let jsonStrings = splitJsonObjects jsonString
     // Process each JSON object in the list using railway-oriented programming
-    jsonStrings |> List.fold (fun (currentCache, currentAccVal) jsonString ->
+    jsonStrings |> List.fold (fun (currentCache) jsonString ->
         match tryParseQuote jsonString with
         | Success quote ->
+            // retrieve the current accumulated trading value
+            let currentAccVal = tradingValueAgent.PostAndReply GetTradingValue 
             // Update the market data cache with the latest quote and identify any arbitrage opportunities
             let updatedCache, newAccVal, opportunity = updateAndProcessQuote currentCache quote config currentAccVal
+            // Update the accumulated trading value
+            tradingValueAgent.Post (UpdateTradingValue newAccVal)
+
             match opportunity with
-            // TODO: Call Order Execution Service to execute the arbitrage opportunity
             | Some arb ->
+                // TODO: Call Order Execution Service to execute the arbitrage opportunity
                 printfn "Opportunity to execute: %A" arb
             | None -> ()
-            (updatedCache, newAccVal)
+            updatedCache
         | Failure errorMsg ->
-            (currentCache, currentAccVal)
-    ) (cache, accumulatedTradingValue)
+            // printfn "Failed to parse quote due to error: %s" errorMsg
+            currentCache
+    ) (cache)
+
+// Async version for performance improvement testing
+// Service function to process a list of JSON strings containing market data quotes
+// let processQuotes (cache: (string * int * Quote) list) (jsonString: string) (config: TradingConfig) : Async<(string * int * Quote) list> =
+//     async {
+//         // Split the JSON string into a list of JSON objects
+//         let jsonStrings = splitJsonObjects jsonString
+//         // Process each JSON object in the list using railway-oriented programming
+//         return! jsonStrings |> List.foldAsync (fun currentCache jsonString ->
+//             async {
+//                 match tryParseQuote jsonString with
+//                 | Success quote ->
+//                     // Retrieve the current accumulated trading value
+//                     let! currentAccVal = tradingValueAgent.PostAndAsyncReply GetTradingValue
+//                     // Update the market data cache with the latest quote and identify any arbitrage opportunities
+//                     let updatedCache, newAccVal, opportunity = updateAndProcessQuote currentCache quote config currentAccVal
+//                     // Update the accumulated trading value
+//                     do! tradingValueAgent.Post (UpdateTradingValue newAccVal)
+
+//                     match opportunity with
+//                     | Some arb ->
+//                         // TODO: Call Order Execution Service to execute the arbitrage opportunity
+//                         printfn "Opportunity to execute: %A" arb
+//                     | None -> ()
+//                     return updatedCache
+//                 | Failure errorMsg ->
+//                     // printfn "Failed to parse quote due to error: %s" errorMsg
+//                     return currentCache
+//             }
+//         ) cache
+//     }
