@@ -28,6 +28,10 @@ type ConfigMessage =
     | UpdateConfig of int * decimal * decimal * decimal * decimal
     | GetConfig of AsyncReplyChannel<(int * decimal * decimal * decimal * decimal)>
 
+type TradingValue =
+    | UpdateTradingValue of decimal
+    | GetTradingValue of AsyncReplyChannel<decimal>
+    
 type TradingConfig = {
     MinimalPriceSpread: decimal
     MinimalProfit: decimal

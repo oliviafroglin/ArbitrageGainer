@@ -4,21 +4,21 @@
     <RestoreSuccess Condition=" '$(RestoreSuccess)' == '' ">True</RestoreSuccess>
     <RestoreTool Condition=" '$(RestoreTool)' == '' ">NuGet</RestoreTool>
     <ProjectAssetsFile Condition=" '$(ProjectAssetsFile)' == '' ">$(MSBuildThisFileDirectory)project.assets.json</ProjectAssetsFile>
-    <NuGetPackageRoot Condition=" '$(NuGetPackageRoot)' == '' ">/Users/wenxiyang/.nuget/packages/</NuGetPackageRoot>
-    <NuGetPackageFolders Condition=" '$(NuGetPackageFolders)' == '' ">/Users/wenxiyang/.nuget/packages/</NuGetPackageFolders>
+    <NuGetPackageRoot Condition=" '$(NuGetPackageRoot)' == '' ">/Users/haimingchen/.nuget/packages/</NuGetPackageRoot>
+    <NuGetPackageFolders Condition=" '$(NuGetPackageFolders)' == '' ">/Users/haimingchen/.nuget/packages/</NuGetPackageFolders>
     <NuGetProjectStyle Condition=" '$(NuGetProjectStyle)' == '' ">PackageReference</NuGetProjectStyle>
-    <NuGetToolVersion Condition=" '$(NuGetToolVersion)' == '' ">6.8.0</NuGetToolVersion>
+    <NuGetToolVersion Condition=" '$(NuGetToolVersion)' == '' ">6.3.3</NuGetToolVersion>
   </PropertyGroup>
   <ItemGroup Condition=" '$(ExcludeRestorePackageImports)' != 'true' ">
-    <SourceRoot Include="/Users/wenxiyang/.nuget/packages/" />
+    <SourceRoot Include="/Users/haimingchen/.nuget/packages/" />
   </ItemGroup>
   <PropertyGroup Condition=" '$(ExcludeRestorePackageImports)' != 'true' ">
-    <PkgSystem_Net_Http_Json Condition=" '$(PkgSystem_Net_Http_Json)' == '' ">/Users/wenxiyang/.nuget/packages/system.net.http.json/8.0.0</PkgSystem_Net_Http_Json>
-    <PkgFSharp_Core Condition=" '$(PkgFSharp_Core)' == '' ">/Users/wenxiyang/.nuget/packages/fsharp.core/8.0.101</PkgFSharp_Core>
-    <PkgSuave Condition=" '$(PkgSuave)' == '' ">/Users/wenxiyang/.nuget/packages/suave/2.6.2</PkgSuave>
-    <PkgNewtonsoft_Json Condition=" '$(PkgNewtonsoft_Json)' == '' ">/Users/wenxiyang/.nuget/packages/newtonsoft.json/13.0.3</PkgNewtonsoft_Json>
-    <PkgMySql_Data Condition=" '$(PkgMySql_Data)' == '' ">/Users/wenxiyang/.nuget/packages/mysql.data/8.3.0</PkgMySql_Data>
-    <PkgFSharp_Data_Npgsql Condition=" '$(PkgFSharp_Data_Npgsql)' == '' ">/Users/wenxiyang/.nuget/packages/fsharp.data.npgsql/2.1.0</PkgFSharp_Data_Npgsql>
-    <PkgFSharp_Data Condition=" '$(PkgFSharp_Data)' == '' ">/Users/wenxiyang/.nuget/packages/fsharp.data/6.4.0</PkgFSharp_Data>
+    <PkgSystem_Net_Http_Json Condition=" '$(PkgSystem_Net_Http_Json)' == '' ">/Users/haimingchen/.nuget/packages/system.net.http.json/8.0.0</PkgSystem_Net_Http_Json>
+    <PkgFSharp_Core Condition=" '$(PkgFSharp_Core)' == '' ">/Users/haimingchen/.nuget/packages/fsharp.core/6.0.7</PkgFSharp_Core>
+    <PkgSuave Condition=" '$(PkgSuave)' == '' ">/Users/haimingchen/.nuget/packages/suave/2.6.2</PkgSuave>
+    <PkgNewtonsoft_Json Condition=" '$(PkgNewtonsoft_Json)' == '' ">/Users/haimingchen/.nuget/packages/newtonsoft.json/13.0.3</PkgNewtonsoft_Json>
+    <PkgMySql_Data Condition=" '$(PkgMySql_Data)' == '' ">/Users/haimingchen/.nuget/packages/mysql.data/8.3.0</PkgMySql_Data>
+    <PkgFSharp_Data_Npgsql Condition=" '$(PkgFSharp_Data_Npgsql)' == '' ">/Users/haimingchen/.nuget/packages/fsharp.data.npgsql/2.1.0</PkgFSharp_Data_Npgsql>
+    <PkgFSharp_Data Condition=" '$(PkgFSharp_Data)' == '' ">/Users/haimingchen/.nuget/packages/fsharp.data/6.4.0</PkgFSharp_Data>
   </PropertyGroup>
 </Project>

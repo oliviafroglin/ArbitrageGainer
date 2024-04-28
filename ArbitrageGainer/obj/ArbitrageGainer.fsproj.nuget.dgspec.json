@@ -1,26 +1,26 @@
 {
   "format": 1,
   "restore": {
-    "/Users/wenxiyang/Desktop/FunctionalProgramming/ArbitrageGainer/ArbitrageGainer.fsproj": {}
+    "/Users/haimingchen/Desktop/functional_prog/FunctionalProgramming/ArbitrageGainer/ArbitrageGainer.fsproj": {}
   },
   "projects": {
-    "/Users/wenxiyang/Desktop/FunctionalProgramming/ArbitrageGainer/ArbitrageGainer.fsproj": {
+    "/Users/haimingchen/Desktop/functional_prog/FunctionalProgramming/ArbitrageGainer/ArbitrageGainer.fsproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "/Users/wenxiyang/Desktop/FunctionalProgramming/ArbitrageGainer/ArbitrageGainer.fsproj",
+        "projectUniqueName": "/Users/haimingchen/Desktop/functional_prog/FunctionalProgramming/ArbitrageGainer/ArbitrageGainer.fsproj",
         "projectName": "ArbitrageGainer",
-        "projectPath": "/Users/wenxiyang/Desktop/FunctionalProgramming/ArbitrageGainer/ArbitrageGainer.fsproj",
-        "packagesPath": "/Users/wenxiyang/.nuget/packages/",
-        "outputPath": "/Users/wenxiyang/Desktop/FunctionalProgramming/ArbitrageGainer/obj/",
+        "projectPath": "/Users/haimingchen/Desktop/functional_prog/FunctionalProgramming/ArbitrageGainer/ArbitrageGainer.fsproj",
+        "packagesPath": "/Users/haimingchen/.nuget/packages/",
+        "outputPath": "/Users/haimingchen/Desktop/functional_prog/FunctionalProgramming/ArbitrageGainer/obj/",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "/Users/wenxiyang/.nuget/NuGet/NuGet.Config"
+          "/Users/haimingchen/.nuget/NuGet/NuGet.Config"
         ],
         "originalTargetFrameworks": [
           "net6.0"
         ],
         "sources": {
-          "/usr/local/share/dotnet/sdk/8.0.101/FSharp/library-packs": {},
+          "/usr/local/share/dotnet/sdk/6.0.418/FSharp/library-packs": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
@@ -37,7 +37,7 @@
             "FSharp.Core": {
               "include": "Runtime, Compile, Build, Native, Analyzers, BuildTransitive",
               "target": "Package",
-              "version": "[8.0.101, )",
+              "version": "[6.0.7, )",
               "generatePathProperty": true
             },
             "FSharp.Data": {
@@ -87,7 +87,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/8.0.101/RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/6.0.418/RuntimeIdentifierGraph.json"
         }
       }
     }

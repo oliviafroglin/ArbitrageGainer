@@ -16,6 +16,7 @@ open ArbitrageService
 open ArbitrageModels
 open System.Globalization
 open MySql.Data.MySqlClient
+open Logging.Logger
 
 let connectionString = "Server=cmu-fp.mysql.database.azure.com;Database=team_database_schema;Uid=sqlserver;Pwd=-*lUp54$JMRku5Ay;SslMode=Required;"
 
@@ -127,9 +128,9 @@ let receiveData (wsClient: ClientWebSocket) : Async<unit> =
     let buffer = Array.zeroCreate 10024
 
     let initialCache = []
-    let initialAccumulatedTradingValue = 0M
+    // let initialAccumulatedTradingValue = 0M
 
-    let rec receiveLoop (cache: (string * int * Quote) list) (accumulatedTradingValue: decimal) = async {
+    let rec receiveLoop (cache: (string * int * Quote) list) = async {
         let segment = new ArraySegment<byte>(buffer)
 
         let! result = wsClient.ReceiveAsync(segment, CancellationToken.None) |> Async.AwaitTask
@@ -137,7 +138,7 @@ let receiveData (wsClient: ClientWebSocket) : Async<unit> =
         match result.MessageType with
         | WebSocketMessageType.Text ->
             let message = Encoding.UTF8.GetString(buffer, 0, result.Count)
-            printfn "Received message: %s" message
+            // printfn "Received message: %s" message
 
             let! isTradingActive = tradingAgent.PostAndAsyncReply CheckStatus
 
@@ -151,21 +152,20 @@ let receiveData (wsClient: ClientWebSocket) : Async<unit> =
                     MaximalTotalTransactionValue = maxTrans
                     MaximalTradingValue = maxTrade
                 }
-                
-                let (updatedCache, newAccumulatedValue) = 
-                    processQuotes cache message config accumulatedTradingValue
 
-                return! receiveLoop updatedCache newAccumulatedValue
+                let updatedCache = processQuotes cache message config
+
+                return! receiveLoop updatedCache
             // If trading is not active, skip processing
             | false ->
                 printfn "Trading is inactive. Skipping processing."
-                return! receiveLoop cache accumulatedTradingValue
+                return! receiveLoop cache
         | _ ->
-            return! receiveLoop cache accumulatedTradingValue
+            return! receiveLoop cache
     }
 
     // Start the loop with the initial state
-    receiveLoop initialCache initialAccumulatedTradingValue
+    receiveLoop initialCache
     
 // Define a type for the message we want to send to the WebSocket
 type Message = { action: string; params: string }    
@@ -238,6 +238,7 @@ let updateConfig (ctx : HttpContext) : Async<HttpContext option> =
                 ctx |> BAD_REQUEST ("update failed")
     
 let startTrading (ctx : HttpContext) : Async<HttpContext option> =
+    logger "Starting Real-Time Trading"
     let isTradingActive = tradingAgent.PostAndReply (CheckStatus)
     match isTradingActive with
     // Start trading if it is not already active
@@ -252,7 +253,7 @@ let startTrading (ctx : HttpContext) : Async<HttpContext option> =
         let config = configAgent.PostAndReply(GetConfig)
         let (numSubscriptions, _, _, _, _) = config
         let subscriptionParameters = getCryptoSubscriptions numSubscriptions historicalCryptoPairs crossTradedCryptoPairs
-
+        printfn "Subscription Parameters: %s" subscriptionParameters
         startWebSocket (uri, apiKey, subscriptionParameters)
         tradingAgent.Post (Start)  // Change trading state to active
         ctx |> OK "Trading started"
