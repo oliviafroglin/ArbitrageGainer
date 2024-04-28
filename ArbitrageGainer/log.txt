@@ -11,3 +11,5 @@
 2024-04-27 15:55:56:286 - Historical Arbitrage Analysis completed in 00:00:00.3333340 seconds called
 2024-04-27 15:55:58:610 - Starting Identify Cross-Traded Pairs called
 2024-04-27 15:55:59:696 - Identify Cross-Traded Pairs completed in 00:00:01.0851700 seconds called
+2024-04-27 21:17:49:376 - Starting Real-Time Trading called
+2024-04-27 21:23:47:661 - Starting Real-Time Trading called

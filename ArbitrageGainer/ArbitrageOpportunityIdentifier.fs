@@ -50,13 +50,6 @@ let identifyArbitrageOpportunity
                 // printfn "Quantity: %M, Transaction value: %M, Profit: %M" quantity transactionValue profit
                 // printfn "Buy from %s at %M, Sell to %s at %M" exchangeToBuyFrom buyPrice exchangeToSellTo sellPrice
 
-                // For tests
-                match profit >= minimalProfit, transactionValue <= maximalTotalTransactionValue, (accTradingVal + transactionValue) <= maximalTradingValue with
-                    | true, true, true -> printfn "Opportunity found"
-                    | false, _, _ -> printfn "Profit not enough"
-                    | _, false, _ -> printfn "Transaction value too high"
-                    | _, _, false -> printfn "Trading value too high"
-
                 // Check if the trading conditions are met
                 match profit >= minimalProfit, transactionValue <= maximalTotalTransactionValue, (accTradingVal + transactionValue) <= maximalTradingValue with
                 // Return the accumulated trading value and the arbitrage opportunity
