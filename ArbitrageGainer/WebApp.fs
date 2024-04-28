@@ -19,6 +19,7 @@ let app : WebPart =
             path "/stop-trading" >=> stopTrading
             path "/pnl/threshold" >=> updateThresholdHandler
             path "/email" >=> updateEmail // for sending email in order execution
+            path "/auto-stop" >=> updateAutoStop
         ]
         GET >=> choose [
             path "/get-historical-data" >=> (fun (ctx: HttpContext) ->

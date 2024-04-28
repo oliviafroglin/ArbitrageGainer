@@ -5,6 +5,10 @@ open System.Net
 open System.Net.Mail
 open System.Threading
 open MySql.Data.MySqlClient
+open Newtonsoft.Json
+open System.Net.Http
+open System.Net.Http.Headers
+open System.Text
 
 open Suave
 open Suave.Filters
@@ -12,63 +16,70 @@ open Suave.Operators
 open Suave.Successful
 open Suave.RequestErrors
 
+open ArbitrageService
+open ArbitrageModels
 // open ManagePnLThresholdInfra
 // open PnLCalculationCore
 // open PnLCalculationService
 // run this file separately for this milestone! 
 
-type Exchange = Kraken | Bitstamp | Bitfinex
-type CryptoCurrencyPair = string
+// type Exchange = Kraken | Bitstamp | Bitfinex
+// type CryptoCurrencyPair = string
 
-type UserDefinedParameters = {
-    ProfitThreshold: decimal option
-}
+// type UserDefinedParameters = {
+//     ProfitThreshold: decimal option
+// }
 
-type ArbitrageOpportunity = {
-    CryptoCurrencyPair: string
-    ExchangeToBuyFrom: Exchange
-    ExchangeToSellTo: Exchange
-    BuyPrice: decimal
-    BuyQuantity: decimal
-    SellPrice: decimal
-    SellQuantity: decimal
-}
+// type ArbitrageOpportunity = {
+//     CryptoCurrencyPair: string
+//     ExchangeToBuyFrom: Exchange
+//     ExchangeToSellTo: Exchange
+//     BuyPrice: decimal
+//     BuyQuantity: decimal
+//     SellPrice: decimal
+//     SellQuantity: decimal
+// }
+// type TransactionType = Buy | Sell
 
-type OrderResponse = {
-    Id: string
-    Market: string
-    DateTime: string
-    Type: string
-    Price: decimal
-    Amount: decimal
-    ClientOrderId: string
-    Status: string
-    Remaining: decimal
-}
+// type OrderDetails = {
+//     Pair: string
+//     Size: decimal
+//     Price: decimal
+//     OrderType: TransactionType  // Buy or Sell
+// }
+// type OrderResponse = {
+//     Id: string
+//     Market: string
+//     DateTime: string
+//     Type: string
+//     Price: decimal
+//     Amount: decimal
+//     ClientOrderId: string
+//     Status: string
+//     Remaining: decimal
+// }
 
-type ApiResponse<'T> = {
-    Error: string list
-    Result: 'T
-}
+// type ApiResponse<'T> = {
+//     Error: string list
+//     Result: 'T
+// }
 
-type Result<'TSuccess, 'TFailure> = 
-    | Success of 'TSuccess 
-    | Failure of 'TFailure
+// type Result<'TSuccess, 'TFailure> = 
+//     | Success of 'TSuccess 
+//     | Failure of 'TFailure
 
-type TransactionType = Buy | Sell
-
-type CompletedTransaction = {
-    TransactionType: TransactionType
-    Price: decimal
-    Amount: decimal
-    TransactionDate: DateTime
-}
+// type CompletedTransaction = {
+//     TransactionType: TransactionType
+//     Price: decimal
+//     Amount: decimal
+//     TransactionDate: DateTime
+// }
 
 let connectionString = "Server=cmu-fp.mysql.database.azure.com;Database=team_database_schema;Uid=sqlserver;Pwd=-*lUp54$JMRku5Ay;SslMode=Required;"
 
-type ProfitMessage =
-    | GetProfit of AsyncReplyChannel<decimal>
-    | SetProfit of decimal
+// type ProfitMessage =
+//     | GetProfit of AsyncReplyChannel<decimal>
+//     | SetProfit of decimal
 
 let profitAgent = MailboxProcessor.Start(fun inbox ->
     let rec loop totalProfit =
@@ -83,14 +94,14 @@ let profitAgent = MailboxProcessor.Start(fun inbox ->
                 // Update the total profit with the new value
                 printfn "Total profit updated to: %A" newProfit
                 return! loop newProfit
+            | AddProfit profitToAdd ->
+                // Add the profit to the total profit
+                printfn "Adding profit: %A" profitToAdd
+                return! loop (totalProfit + profitToAdd)
         }
     // Initially, total profit is set to zero
     loop 0m
 )
-
-type EmailMessage =
-    | GetEmail of AsyncReplyChannel<string>
-    | SetEmail of string
 
 let emailAgent = MailboxProcessor.Start(fun inbox ->
     let rec loop email =
@@ -106,6 +117,20 @@ let emailAgent = MailboxProcessor.Start(fun inbox ->
         }
     loop ""
     // for testing, can do: loop "xiaojun3@andrew.cmu", will be integrated to use next milestone
+)
+
+let autoStopAgent = MailboxProcessor.Start(fun inbox ->
+    let rec loop isAutoStop =
+        async {
+            let! message = inbox.Receive()
+            match message with
+            | GetAutoStop replyChannel ->
+                replyChannel.Reply(isAutoStop)
+                return! loop isAutoStop
+            | SetAutoStop newAutoStop ->
+                return! loop newAutoStop
+        }
+    loop true
 )
 
 // profitAgent.Post(SetProfit 1000m)
@@ -138,13 +163,21 @@ let notifyUser (email: string) (subject: string) (body: string) =
         printfn "Failed to send email. Error: %s" errMsg
     ()
 
-let updateProfitAndCheckThreshold userParams =
+let updateProfitAndCheckThreshold  =
+    //TODO: Fetch threshold from another module
+    let ProfitThreshold : decimal option = Some 10000m
     // Retrieve the current total profit synchronously
     let totalProfit = profitAgent.PostAndReply(GetProfit)
-    printfn "Checking threshold: Current Total Profit = %A, Threshold = %A" totalProfit userParams.ProfitThreshold
+    printfn "Checking threshold: Current Total Profit = %A, Threshold = %A" totalProfit ProfitThreshold
 
-    match userParams.ProfitThreshold with
+    match ProfitThreshold with
     | Some threshold when totalProfit >= threshold ->
+        let isAutoStop = autoStopAgent.PostAndReply(GetAutoStop)
+        match isAutoStop with
+        | true ->
+            tradingAgent.Post (Stop)
+        | false ->
+            ()
         // Notify the user if the profit threshold has been exceeded
         printfn "Threshold met or exceeded. Triggering email notification."
         let emailUser = emailAgent.PostAndReply(GetEmail)
@@ -153,56 +186,7 @@ let updateProfitAndCheckThreshold userParams =
     | _ ->
         // Log the current total profit for information
         printfn "Threshold not met. Current Total Profit: %A" totalProfit
-
-        () 
-
-
-let mockOrderResponse (opportunity: ArbitrageOpportunity) (isBuy: bool) (simulatePartial: bool) : Result<ApiResponse<OrderResponse>, string> =
-    match simulatePartial with
-    | true ->
-        let filledAmount = opportunity.BuyQuantity * 0.5m
-        let remaining = opportunity.BuyQuantity - filledAmount
-        let status = "Partially filled"
-        Success {
-            Error = []
-            Result = {
-                Id = System.Guid.NewGuid().ToString()
-                Market = opportunity.CryptoCurrencyPair
-                DateTime = System.DateTime.UtcNow.ToString("o")
-                Type = match isBuy with
-                       | true -> "buy"
-                       | false -> "sell"
-                Price = match isBuy with
-                        | true -> opportunity.BuyPrice
-                        | false -> opportunity.SellPrice
-                Amount = filledAmount
-                ClientOrderId = System.Guid.NewGuid().ToString()
-                Status = status
-                Remaining = remaining
-            }
-        }
-    | false ->
-        let filledAmount = opportunity.BuyQuantity
-        let remaining = 0m
-        let status = "Filled"
-        Success {
-            Error = []
-            Result = {
-                Id = System.Guid.NewGuid().ToString()
-                Market = opportunity.CryptoCurrencyPair
-                DateTime = System.DateTime.UtcNow.ToString("o")
-                Type = match isBuy with
-                       | true -> "buy"
-                       | false -> "sell"
-                Price = match isBuy with
-                        | true -> opportunity.BuyPrice
-                        | false -> opportunity.SellPrice
-                Amount = filledAmount
-                ClientOrderId = System.Guid.NewGuid().ToString()
-                Status = status
-                Remaining = remaining
-            }
-        }
+        ()
 
 let insertCompletedTransaction (transaction: CompletedTransaction) =
     try
@@ -218,17 +202,14 @@ let insertCompletedTransaction (transaction: CompletedTransaction) =
                 match result with
                 | count when count > 0 ->
                     printfn "Insertion successful. %d row(s) affected." count
-                    true
                 | _ ->
                     printfn "No rows were inserted."
-                    false
     with
     | ex -> printfn "An error occurred: %s" ex.Message
-            false
 
 
 // Helper function to process a transaction and return the updated profit.
-let processTransactionResponse direction (apiResponse: ApiResponse<OrderResponse>) remainingAmount userParams =
+let processTransactionResponse direction (apiResponse: ApiResponse<OrderResponse>) remainingAmount : unit =
     // Calculate the impact on profit based on the transaction direction
     let priceImpact = apiResponse.Result.Price * apiResponse.Result.Amount
     let profitUpdate = match direction with
@@ -242,12 +223,13 @@ let processTransactionResponse direction (apiResponse: ApiResponse<OrderResponse
         Amount = apiResponse.Result.Amount
         TransactionDate = DateTime.UtcNow
     }
-    insertCompletedTransaction completedTransaction |> ignore
+    insertCompletedTransaction completedTransaction
 
     // Handle partially filled status
     // Check the status of the API response and handle accordingly
     match apiResponse.Result.Status with
     | "Partially filled" ->
+        //TODO: Emit another transaction for the remaining amount
         // Calculate the remaining amount after accounting for the amount already processed
         let updatedRemainingAmount = remainingAmount - apiResponse.Result.Amount
         let remainingTransaction = {
@@ -259,32 +241,121 @@ let processTransactionResponse direction (apiResponse: ApiResponse<OrderResponse
         // Insert the transaction for the remaining amount into the database
         insertCompletedTransaction remainingTransaction |> ignore
     | _ -> ()  // Do nothing if the transaction status is not 'Partially filled'
-    profitUpdate
+    
+    profitAgent.Post(AddProfit profitUpdate)
 
+let submitOrderInBitstamp (order: OrderDetails) =
+    async {
+        use client = new HttpClient()
+        client.DefaultRequestHeaders.Accept.Add(MediaTypeWithQualityHeaderValue("application/x-www-form-urlencoded"))
+        
+        let uri = "https://18656-testing-server.azurewebsites.net/order/place/api/v2/" + (if order.OrderType = Buy then "buy" else "sell") + "/market/" + order.Pair.ToLower() + "/"
+        let body = sprintf "amount=%f&price=%f" order.Size order.Price
+        let content = new StringContent(body, Encoding.UTF8, "application/x-www-form-urlencoded")
+        
+        printfn "Sending request to Bitstamp with data: %s" body
+        let! response = client.PostAsync(uri, content) |> Async.AwaitTask
+        if response.IsSuccessStatusCode then
+            let! responseString = response.Content.ReadAsStringAsync() |> Async.AwaitTask
+            try
+                let orderResponse = JsonConvert.DeserializeObject<OrderResponse>(responseString)
+                return Success { Error = []; Result = orderResponse }
+            with ex ->
+                printfn "Failed to deserialize JSON response: %s" ex.Message
+                return Failure (sprintf "Failed to deserialize JSON response: %s" ex.Message)
+        else
+            printfn "Failed to place order on Bitstamp: %s" response.ReasonPhrase
+            return Failure response.ReasonPhrase
+    }
+
+
+let submitOrderInKraken (order: OrderDetails) =
+    async {
+        use client = new HttpClient()
+        client.DefaultRequestHeaders.Accept.Add(MediaTypeWithQualityHeaderValue("application/json"))
+        
+        let uri = "https://18656-testing-server.azurewebsites.net/order/place/0/private/AddOrder"
+        let body = sprintf "nonce=%i&ordertype=market&type=%s&volume=%f&pair=%s&price=%f" 1 (if order.OrderType = Buy then "buy" else "sell") order.Size order.Pair order.Price
+        let content = new StringContent(body, Encoding.UTF8, "application/json")
+        
+        printfn "Sending request to Kraken with data: %s" body
+        let! response = client.PostAsync(uri, content) |> Async.AwaitTask
+        if response.IsSuccessStatusCode then
+            let! responseString = response.Content.ReadAsStringAsync() |> Async.AwaitTask
+            try
+                let orderResponse = JsonConvert.DeserializeObject<OrderResponse>(responseString)
+                return Success { Error = []; Result = orderResponse }
+            with ex ->
+                printfn "Failed to deserialize JSON response: %s" ex.Message
+                return Failure (sprintf "Failed to deserialize JSON response: %s" ex.Message)
+        else
+            printfn "Failed to place order on Kraken: %s" response.ReasonPhrase
+            return Failure response.ReasonPhrase
+    }
+
+let submitOrderInBitfinex (order: OrderDetails) =
+    async {
+        use client = new HttpClient()
+        client.DefaultRequestHeaders.Accept.Add(MediaTypeWithQualityHeaderValue("application/json"))
+        
+        let uri = "https://18656-testing-server.azurewebsites.net/order/place/v2/auth/w/order/submit"
+        let body = sprintf "type=market&symbol=%s&amount=%f&price=%f" order.Pair order.Size order.Price
+        let content = new StringContent(body, Encoding.UTF8, "application/json")
+        
+        printfn "Sending request to Bitfinex with data: %s" body
+        let! response = client.PostAsync(uri, content) |> Async.AwaitTask
+        if response.IsSuccessStatusCode then
+            let! responseString = response.Content.ReadAsStringAsync() |> Async.AwaitTask
+            try
+                let orderResponse = JsonConvert.DeserializeObject<OrderResponse>(responseString)
+                return Success { Error = []; Result = orderResponse }
+            with ex ->
+                printfn "Failed to deserialize JSON response: %s" ex.Message
+                return Failure (sprintf "Failed to deserialize JSON response: %s" ex.Message)
+        else
+            printfn "Failed to place order on Bitfinex: %s" response.ReasonPhrase
+            return Failure response.ReasonPhrase
+    }
+
+let convertToOrderDetails (opportunity: ArbitrageOpportunity) (isBuy: bool) (remainingAmount: decimal) : OrderDetails =
+    {
+        Pair = opportunity.CryptoCurrencyPair
+        Size = remainingAmount
+        Price = if isBuy then opportunity.BuyPrice else opportunity.SellPrice
+        OrderType = if isBuy then Buy else Sell
+    }
 // Function to execute a transaction and handle the response.
-let executeTransaction direction opportunity userParams remainingAmount initialProfit =
-    mockOrderResponse {opportunity with BuyQuantity = remainingAmount; SellQuantity = remainingAmount} (direction = Buy) false
-    |> function
-    | Success apiResponse ->
-        let profitUpdate = processTransactionResponse direction apiResponse remainingAmount userParams
-        // Update the global profit and return new total
-        profitAgent.Post(SetProfit (initialProfit + profitUpdate))
-        initialProfit + profitUpdate
-    | Failure error ->
-        let emailUser2 = emailAgent.PostAndReply(GetEmail)
-        notifyUser emailUser2 "Transaction Failure" error
-        initialProfit
+let executeTransaction (direction: TransactionType) (opportunity: ArbitrageOpportunity) (remainingAmount: decimal) : Async<unit> =
+    async {
+        let exchange = if direction = Buy then opportunity.ExchangeToBuyFrom else opportunity.ExchangeToSellTo
+        let orderDetails = convertToOrderDetails opportunity (direction = Buy) remainingAmount
+        
+        let! apiResponse =
+            match exchange with
+            | Kraken -> submitOrderInKraken orderDetails
+            | Bitstamp -> submitOrderInBitstamp orderDetails
+            | Bitfinex -> submitOrderInBitfinex orderDetails
+            | Unknown -> async.Return (Failure "Unknown Exchange")
+        //TODO: Request order status and handle partial fills
+        match apiResponse with
+            | Success result ->
+                printfn "Transaction for exchange %A successful. Result: %A" exchange result
+                processTransactionResponse direction result remainingAmount
+            | Failure error ->
+                let emailUser = emailAgent.PostAndReply(GetEmail)
+                notifyUser emailUser "Transaction Failure" error
+    }
+
 
 // Main function to handle both buy and sell transactions.
-let simulateOrderExecution (opportunity: ArbitrageOpportunity) (userParams: UserDefinedParameters) =
-    let initialProfit = 0m
+let simulateOrderExecution (opportunity: ArbitrageOpportunity) =
     // Execute buy transaction
-    let profitAfterBuy = executeTransaction Buy opportunity userParams opportunity.BuyQuantity initialProfit
+    executeTransaction Buy opportunity opportunity.BuyQuantity |> Async.RunSynchronously
     // Execute sell transaction
-    let finalProfit = executeTransaction Sell opportunity userParams opportunity.SellQuantity profitAfterBuy
+    executeTransaction Sell opportunity opportunity.SellQuantity |> Async.RunSynchronously
 
     // After processing both transactions, check if the total profit meets the threshold.
-    updateProfitAndCheckThreshold userParams
+    updateProfitAndCheckThreshold
 
 
 let updateEmail (ctx: HttpContext): Async<HttpContext option> =
@@ -295,6 +366,16 @@ let updateEmail (ctx: HttpContext): Async<HttpContext option> =
     | _ ->
         ctx |> BAD_REQUEST ("Email key not found or no value provided")  // Handle other cases
 
+let updateAutoStop (ctx: HttpContext): Async<HttpContext option> =
+    match ctx.request.query |> List.tryFind (fun (key, _) -> key = "stop") with
+    | yes ->
+        do autoStopAgent.Post (SetAutoStop true)  // This should return Async<unit>
+        ctx |> OK ("AutoStop updated to yes")  // Wrap in Async
+    | no ->
+        do autoStopAgent.Post (SetAutoStop false)  // This should return Async<unit>
+        ctx |> OK ("AutoStop updated to no")  // Wrap in Async
+    | _ ->
+        ctx |> BAD_REQUEST ("Invalid AutoStop value")  // Handle other cases
 
 // below is commented out, can be commented in for testing reasons: 
 // let app : WebPart =
