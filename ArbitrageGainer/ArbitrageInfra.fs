@@ -238,12 +238,13 @@ let updateConfig (ctx : HttpContext) : Async<HttpContext option> =
                 ctx |> BAD_REQUEST ("update failed")
     
 let startTrading (ctx : HttpContext) : Async<HttpContext option> =
+    let logger = createLogger
     logger "Starting Real-Time Trading"
     let isTradingActive = tradingAgent.PostAndReply (CheckStatus)
     match isTradingActive with
     // Start trading if it is not already active
     | false ->
-        let uri = Uri("wss://socket.polygon.io/crypto")
+        let uri = Uri("wss://one8656-live-data.onrender.com/")
         let apiKey = "phN6Q_809zxfkeZesjta_phpgQCMB2Dw"
 
         let (crossTradedCryptoPairs, historicalCryptoPairs) = fetchCrossAndHistPairs
