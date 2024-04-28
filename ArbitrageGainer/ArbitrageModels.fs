@@ -82,6 +82,41 @@ type OrderResponse = {
     Remaining: decimal
 }
 
+type KrakenInnerRes = {
+    order: string
+}
+
+type KrakenNestedRes = {
+    descr: KrakenInnerRes
+    txid: string[]
+}
+
+type KrakenDecodeRes = {
+    error: string[]
+    result: KrakenNestedRes
+}
+
+type KrakenOrder = {
+    TxId: string
+}
+
+type BitstampOrder = {
+    StampId: string
+}
+
+type BitfinexDecodeRes = 
+    int64 * string * int * obj * (int64 * obj * int64 * string * int64 * int64 * float * float * string * obj * obj * obj * int * string * obj * obj * float * int * int * int * obj * obj * obj * int * int * obj * obj * obj * string * obj * obj * obj) array * obj * string * string
+
+type BitfinexOrder = {
+    FinexId: string
+}
+
+
+type OrderResult =
+    | KrakenResult of KrakenOrder
+    | BitstampResult of BitstampOrder
+    | BitfinexResult of BitfinexOrder
+
 type ApiResponse<'T> = {
     Error: string list
     Result: 'T

@@ -9,6 +9,8 @@ open Newtonsoft.Json
 open System.Net.Http
 open System.Net.Http.Headers
 open System.Text
+open FSharp.Data
+open Newtonsoft.Json.Linq
 
 open Suave
 open Suave.Filters
@@ -77,7 +79,7 @@ open ArbitrageModels
 
 let connectionString = "Server=cmu-fp.mysql.database.azure.com;Database=team_database_schema;Uid=sqlserver;Pwd=-*lUp54$JMRku5Ay;SslMode=Required;"
 
-// type ProfitMessage =
+type BitstampResponse = JsonProvider<"""{"id":"1234","market":"FET/USD","datetime":"2023-12-31 14:43:15.796000","type":"0","price":"22.45","amount":"58.06000000","client_order_id":"123456789"}""">
 //     | GetProfit of AsyncReplyChannel<decimal>
 //     | SetProfit of decimal
 
@@ -243,13 +245,81 @@ let processTransactionResponse direction (apiResponse: ApiResponse<OrderResponse
     | _ -> ()  // Do nothing if the transaction status is not 'Partially filled'
     
     profitAgent.Post(AddProfit profitUpdate)
+    
+let getOrderStatusBitstamp (orderId: string) =
+    async {
+        use client = new HttpClient()
+        let uri = "https://18656-testing-server.azurewebsites.net/order/status/api/v2/order_status/"
+        let requestBody = sprintf "id=%s" orderId
+        let content = new StringContent(requestBody, Encoding.UTF8, "application/x-www-form-urlencoded")
+        
+        let! response = client.PostAsync(uri, content) |> Async.AwaitTask
+        if response.IsSuccessStatusCode then
+            let! responseString = response.Content.ReadAsStringAsync() |> Async.AwaitTask
+            try
+                let orderStatus = JsonConvert.DeserializeObject<OrderResponse>(responseString)
+                printfn "Order status retrieved: %A" orderStatus
+                return Success orderStatus
+            with ex ->
+                printfn "Failed to retrieve order status: %s" ex.Message
+                return Failure (sprintf "Failed to retrieve order status: %s" ex.Message)
+        else
+            printfn "Failed to retrieve order status: %s" response.ReasonPhrase
+            return Failure response.ReasonPhrase
+    }
+
+let getOrderStatusKraken (orderId: string) =
+    async {
+        use client = new HttpClient()
+        let uri = "https://18656-testing-server.azurewebsites.net/order/status/0/private/QueryOrders"
+        let requestBody = sprintf "nonce=%i&txid=%s&trades=true" 1 orderId
+        let content = new StringContent(requestBody, Encoding.UTF8, "application/json")
+
+        let! response = client.PostAsync(uri, content) |> Async.AwaitTask
+        if response.IsSuccessStatusCode then
+            let! responseString = response.Content.ReadAsStringAsync() |> Async.AwaitTask
+            try
+                let orderStatus = JsonConvert.DeserializeObject<OrderResponse>(responseString)
+                printfn "Order status retrieved for Kraken: %A" orderStatus
+                return Success orderStatus
+            with ex ->
+                printfn "Failed to retrieve Kraken order status: %s" ex.Message
+                return Failure (sprintf "Failed to retrieve Kraken order status: %s" ex.Message)
+        else
+            printfn "Failed to retrieve Kraken order status: %s" response.ReasonPhrase
+            return Failure response.ReasonPhrase
+    }
+
+let getOrderStatusBitfinex (cryptoPair: string) (orderId: string) =
+    async {
+        use client = new HttpClient()
+        let uri = sprintf "https://18656-testing-server.azurewebsites.net/order/status/auth/r/order/t%s:%s/trades" cryptoPair orderId
+        let requestBody = sprintf ""
+        let content = new StringContent(requestBody, Encoding.UTF8, "application/json")
+
+        let! response = client.PostAsync(uri, content) |> Async.AwaitTask
+        if response.IsSuccessStatusCode then
+            let! responseString = response.Content.ReadAsStringAsync() |> Async.AwaitTask
+            try
+                let orderStatus = JsonConvert.DeserializeObject<OrderResponse>(responseString)
+                printfn "Order status retrieved for Bitfinex: %A" orderStatus
+                return Success orderStatus
+            with ex ->
+                printfn "Failed to retrieve Bitfinex order status: %s" ex.Message
+                return Failure (sprintf "Failed to retrieve Bitfinex order status: %s" ex.Message)
+        else
+            printfn "Failed to retrieve Bitfinex order status: %s" response.ReasonPhrase
+            return Failure response.ReasonPhrase
+    }
+
 
 let submitOrderInBitstamp (order: OrderDetails) =
     async {
         use client = new HttpClient()
         client.DefaultRequestHeaders.Accept.Add(MediaTypeWithQualityHeaderValue("application/x-www-form-urlencoded"))
         
-        let uri = "https://18656-testing-server.azurewebsites.net/order/place/api/v2/" + (if order.OrderType = Buy then "buy" else "sell") + "/market/" + order.Pair.ToLower() + "/"
+        let normalizedPair = order.Pair.Replace("-", "").ToLower()
+        let uri = sprintf "https://18656-testing-server.azurewebsites.net/order/place/api/v2/%s/market/%s/" (if order.OrderType = Buy then "buy" else "sell") normalizedPair
         let body = sprintf "amount=%f&price=%f" order.Size order.Price
         let content = new StringContent(body, Encoding.UTF8, "application/x-www-form-urlencoded")
         
@@ -258,8 +328,11 @@ let submitOrderInBitstamp (order: OrderDetails) =
         if response.IsSuccessStatusCode then
             let! responseString = response.Content.ReadAsStringAsync() |> Async.AwaitTask
             try
-                let orderResponse = JsonConvert.DeserializeObject<OrderResponse>(responseString)
-                return Success { Error = []; Result = orderResponse }
+                let orderResponse = BitstampResponse.Parse(responseString)
+                let order = {
+                    StampId = string orderResponse.Id
+                }
+                return Success { Error = []; Result = BitstampResult order }
             with ex ->
                 printfn "Failed to deserialize JSON response: %s" ex.Message
                 return Failure (sprintf "Failed to deserialize JSON response: %s" ex.Message)
@@ -275,7 +348,8 @@ let submitOrderInKraken (order: OrderDetails) =
         client.DefaultRequestHeaders.Accept.Add(MediaTypeWithQualityHeaderValue("application/json"))
         
         let uri = "https://18656-testing-server.azurewebsites.net/order/place/0/private/AddOrder"
-        let body = sprintf "nonce=%i&ordertype=market&type=%s&volume=%f&pair=%s&price=%f" 1 (if order.OrderType = Buy then "buy" else "sell") order.Size order.Pair order.Price
+        let pair = "XX" + order.Pair.Replace("-", "")
+        let body = sprintf "nonce=%s&ordertype=market&type=%s&volume=%s&pair=%s&price=%s" "1" (if order.OrderType = Buy then "buy" else "sell") (string order.Size) pair (string order.Price)
         let content = new StringContent(body, Encoding.UTF8, "application/json")
         
         printfn "Sending request to Kraken with data: %s" body
@@ -283,8 +357,15 @@ let submitOrderInKraken (order: OrderDetails) =
         if response.IsSuccessStatusCode then
             let! responseString = response.Content.ReadAsStringAsync() |> Async.AwaitTask
             try
-                let orderResponse = JsonConvert.DeserializeObject<OrderResponse>(responseString)
-                return Success { Error = []; Result = orderResponse }
+                let orderResponse = JsonConvert.DeserializeObject<KrakenDecodeRes>(responseString)
+                match orderResponse.result.txid with
+                    | [| txid |] ->
+                        let order = {
+                            TxId = txid
+                        }
+                        return Success { Error = []; Result = KrakenResult order }
+                    | _ -> 
+                        return Failure "Failed to parse Kraken response"
             with ex ->
                 printfn "Failed to deserialize JSON response: %s" ex.Message
                 return Failure (sprintf "Failed to deserialize JSON response: %s" ex.Message)
@@ -293,22 +374,31 @@ let submitOrderInKraken (order: OrderDetails) =
             return Failure response.ReasonPhrase
     }
 
+
 let submitOrderInBitfinex (order: OrderDetails) =
     async {
         use client = new HttpClient()
         client.DefaultRequestHeaders.Accept.Add(MediaTypeWithQualityHeaderValue("application/json"))
         
         let uri = "https://18656-testing-server.azurewebsites.net/order/place/v2/auth/w/order/submit"
-        let body = sprintf "type=market&symbol=%s&amount=%f&price=%f" order.Pair order.Size order.Price
-        let content = new StringContent(body, Encoding.UTF8, "application/json")
-        
-        printfn "Sending request to Bitfinex with data: %s" body
+        let pair = "t" + order.Pair.Replace("-", "")
+        let requestBody = sprintf "type=%s&symbol=%s&amount=%s&price=%s" "MARKET" pair (string order.Size) (string order.Price)
+        let content = new StringContent(requestBody, Encoding.UTF8, "application/json")
+
+        printfn "Sending request to Bitfinex with data: %s" requestBody
         let! response = client.PostAsync(uri, content) |> Async.AwaitTask
         if response.IsSuccessStatusCode then
             let! responseString = response.Content.ReadAsStringAsync() |> Async.AwaitTask
             try
-                let orderResponse = JsonConvert.DeserializeObject<OrderResponse>(responseString)
-                return Success { Error = []; Result = orderResponse }
+                let orderResponse = JsonConvert.DeserializeObject<BitfinexDecodeRes[]>(responseString)
+                match orderResponse with
+                    | [| (_, _, _, _, [| (orderId, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _) |], _, _, _) |] ->
+                        let order = {
+                            FinexId = string orderId
+                        }
+                        return Success { Error = []; Result = BitfinexResult order }
+                    | _ -> 
+                        return Failure ("Failed to parse Bitfinex response")
             with ex ->
                 printfn "Failed to deserialize JSON response: %s" ex.Message
                 return Failure (sprintf "Failed to deserialize JSON response: %s" ex.Message)
@@ -336,15 +426,37 @@ let executeTransaction (direction: TransactionType) (opportunity: ArbitrageOppor
             | Bitstamp -> submitOrderInBitstamp orderDetails
             | Bitfinex -> submitOrderInBitfinex orderDetails
             | Unknown -> async.Return (Failure "Unknown Exchange")
-        //TODO: Request order status and handle partial fills
+        
+        printfn "Transaction for exchange %A completed. API response: %A" exchange apiResponse
         match apiResponse with
-            | Success result ->
-                printfn "Transaction for exchange %A successful. Result: %A" exchange result
-                processTransactionResponse direction result remainingAmount
-            | Failure error ->
-                let emailUser = emailAgent.PostAndReply(GetEmail)
-                notifyUser emailUser "Transaction Failure" error
+        | Success result ->
+            printfn "Transaction for exchange %A successful. Result: %A" exchange result
+            do! Async.Sleep(5000) // 5-second delay
+
+            let! statusResult = 
+                match result.Result with
+                | KrakenResult kr -> 
+                    getOrderStatusKraken kr.TxId
+                | BitstampResult bs -> 
+                    getOrderStatusBitstamp bs.StampId
+                | BitfinexResult bf -> 
+                    let pair = "t" + orderDetails.Pair.Replace("-", "")
+                    getOrderStatusBitfinex pair bf.FinexId
+                | _ -> async.Return (Failure "Unknown or unsupported exchange result type")
+
+            match statusResult with
+            | Success status ->
+                printfn "Status after 5 seconds: %A" status
+                //TODO: Process the status and update the profit
+                // processTransactionResponse direction result remainingAmount |> ignore
+            | Failure errorStatus ->
+                printfn "Failed to retrieve order status after 5 seconds: %s" errorStatus
+        | Failure error ->
+            printfn "Transaction for exchange %A failed. Error: %s" exchange error
+            let emailUser = emailAgent.PostAndReply(GetEmail)
+            notifyUser emailUser "Transaction Failure" error
     }
+
 
 
 // Main function to handle both buy and sell transactions.
