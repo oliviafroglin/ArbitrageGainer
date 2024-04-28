@@ -32,6 +32,23 @@ let tradingAgent = MailboxProcessor.Start(fun inbox ->
     loop false
 )
 
+// A mailbox processor for the configuration agent
+let configAgent = MailboxProcessor.Start(fun inbox ->
+    let rec loop (numSubscriptions, minSpread, minProfit, maxTransactionValue, maxTradingValue) =
+        async {
+            let! message = inbox.Receive()
+            match message with
+            // Update the configuration with the new values
+            | UpdateConfig (newNumSubscriptions, newMinSpread, newMinProfit, newMaxTransactionValue, newMaxTradingValue) ->
+                return! loop (newNumSubscriptions, newMinSpread, newMinProfit, newMaxTransactionValue, newMaxTradingValue)
+            // Get the current configuration values
+            | GetConfig reply ->
+                reply.Reply (numSubscriptions, minSpread, minProfit, maxTransactionValue, maxTradingValue)
+                return! loop (numSubscriptions, minSpread, minProfit, maxTransactionValue, maxTradingValue)
+        }
+    // Start the loop with the initial configuration values
+    loop (0, 0M, 0M, 0M, 0M))
+    
 // A mailbox processor for the accumulated trading value agent
 let tradingValueAgent = MailboxProcessor.Start(fun inbox ->
     let rec loop tradingValue =
