@@ -23,11 +23,11 @@
     <Compile Include="ArbitrageOpportunityIdentifier.fs" />
     <Compile Include="MarketDataRetrieval.fs" />
     <Compile Include="ArbitrageService.fs" />
-    <Compile Include="ArbitrageInfra.fs" />
     <Compile Include="OrderExecutionInfra.fs" />
     <Compile Include="IdentifyCrossTradedPairsCore.fs" />
     <Compile Include="IdentifyCrossTradedPairsService.fs" />
     <Compile Include="IdentifyCrossTradedPairsInfra.fs" />
+    <Compile Include="ArbitrageInfra.fs" />
     <Compile Include="WebApp.fs" />
   </ItemGroup>
 

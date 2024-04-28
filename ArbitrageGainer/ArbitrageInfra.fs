@@ -13,6 +13,7 @@ open Suave.Successful
 open Suave.RequestErrors
 open FSharp.Data
 open ArbitrageService
+open OrderExecutionInfra
 open ArbitrageModels
 open System.Globalization
 open MySql.Data.MySqlClient
@@ -71,30 +72,6 @@ let fetchCrossAndHistPairs =
         printfn "Database error: %s" ex.Message
         ([], [])
 
-
-// A mailbox processor for the trading agent
-let tradingAgent = MailboxProcessor.Start(fun inbox ->
-    let rec loop tradingActive =
-        async {
-            let! message = inbox.Receive()
-            match message with
-            | Start ->
-                printfn "Trading started."
-                // Set trading to active
-                return! loop true
-            | Stop ->
-                printfn "Trading stopped."
-                // Set trading to inactive
-                return! loop false
-            | CheckStatus replyChannel ->
-                // Respond with the current trading state
-                replyChannel.Reply(tradingActive)
-                return! loop tradingActive
-        }
-    //Initially, trading is not active.
-    loop false
-)
-
 // A mailbox processor for the configuration agent
 let configAgent = MailboxProcessor.Start(fun inbox ->
     let rec loop (numSubscriptions, minSpread, minProfit, maxTransactionValue, maxTradingValue) =
@@ -122,7 +99,35 @@ let connectToWebSocket (uri: Uri) =
         //Returning Websockets instance from async workflow
         return wsClient
         }
-     
+
+// Service function to process a list of JSON strings containing market data quotes    
+let processQuotes (cache: (string * int * Quote) list) (jsonString: string) (config: TradingConfig) =
+    // Split the JSON string into a list of JSON objects
+
+    let jsonStrings = splitJsonObjects jsonString
+    // Process each JSON object in the list using railway-oriented programming
+    jsonStrings |> List.fold (fun (currentCache) jsonString ->
+        match tryParseQuote jsonString with
+        | Success quote ->
+            // retrieve the current accumulated trading value
+            let currentAccVal = tradingValueAgent.PostAndReply GetTradingValue 
+            // Update the market data cache with the latest quote and identify any arbitrage opportunities
+            let updatedCache, newAccVal, opportunity = updateAndProcessQuote currentCache quote config currentAccVal
+            // Update the accumulated trading value
+            tradingValueAgent.Post (UpdateTradingValue newAccVal)
+
+            match opportunity with
+            | Some arb ->
+                // TODO: Call Order Execution Service to execute the arbitrage opportunity
+                printfn "Opportunity to execute: %A" arb
+                simulateOrderExecution arb
+            | None -> ()
+            updatedCache
+        | Failure errorMsg ->
+            // printfn "Failed to parse quote due to error: %s" errorMsg
+            currentCache
+    ) (cache)
+
 // Define a function to receive data from the WebSocket
 let receiveData (wsClient: ClientWebSocket) : Async<unit> =
     let buffer = Array.zeroCreate 10024

@@ -9,6 +9,29 @@ open ArbitrageModels
 // Define a type provider for the market data JSON schema
 type MarketData = JsonProvider<"""{"ev":"XQ","pair":"DOT-USD","lp":0,"ls":0,"bp":6.7818,"bs":14.22,"ap":6.7819,"as":385.28012,"t":1714260364410,"x":23,"r":1714260364453}""">
 
+// A mailbox processor for the trading agent
+let tradingAgent = MailboxProcessor.Start(fun inbox ->
+    let rec loop tradingActive =
+        async {
+            let! message = inbox.Receive()
+            match message with
+            | Start ->
+                printfn "Trading started."
+                // Set trading to active
+                return! loop true
+            | Stop ->
+                printfn "Trading stopped."
+                // Set trading to inactive
+                return! loop false
+            | CheckStatus replyChannel ->
+                // Respond with the current trading state
+                replyChannel.Reply(tradingActive)
+                return! loop tradingActive
+        }
+    //Initially, trading is not active.
+    loop false
+)
+
 // A mailbox processor for the accumulated trading value agent
 let tradingValueAgent = MailboxProcessor.Start(fun inbox ->
     let rec loop tradingValue =
@@ -76,34 +99,6 @@ let updateAndProcessQuote (cache: (string * int * Quote) list) (quote: Quote) (c
     | false ->
         printfn "Quote from exchange ID %d ignored" quote.ExchangeId
         (cache, accumulatedTradingValue, None)
-
-
-// Service function to process a list of JSON strings containing market data quotes    
-let processQuotes (cache: (string * int * Quote) list) (jsonString: string) (config: TradingConfig) =
-    // Split the JSON string into a list of JSON objects
-
-    let jsonStrings = splitJsonObjects jsonString
-    // Process each JSON object in the list using railway-oriented programming
-    jsonStrings |> List.fold (fun (currentCache) jsonString ->
-        match tryParseQuote jsonString with
-        | Success quote ->
-            // retrieve the current accumulated trading value
-            let currentAccVal = tradingValueAgent.PostAndReply GetTradingValue 
-            // Update the market data cache with the latest quote and identify any arbitrage opportunities
-            let updatedCache, newAccVal, opportunity = updateAndProcessQuote currentCache quote config currentAccVal
-            // Update the accumulated trading value
-            tradingValueAgent.Post (UpdateTradingValue newAccVal)
-
-            match opportunity with
-            | Some arb ->
-                // TODO: Call Order Execution Service to execute the arbitrage opportunity
-                printfn "Opportunity to execute: %A" arb
-            | None -> ()
-            updatedCache
-        | Failure errorMsg ->
-            // printfn "Failed to parse quote due to error: %s" errorMsg
-            currentCache
-    ) (cache)
 
 // Async version for performance improvement testing
 // Service function to process a list of JSON strings containing market data quotes

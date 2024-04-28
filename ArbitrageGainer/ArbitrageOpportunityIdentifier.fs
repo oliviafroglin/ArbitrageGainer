@@ -4,10 +4,10 @@ open ArbitrageModels
 
 let convertExIdToName id =
     match id with
-    | 2 -> "Bitfinex"
-    | 6 -> "Bitstamp"
-    | 23 -> "Kraken"
-    | _ -> "Unknown"
+    | 2 -> Bitfinex
+    | 6 -> Bitstamp
+    | 23 -> Kraken
+    | _ -> Unknown
 
 // Function to identify arbitrage opportunities based on the market data cache, quote, and trading configuration
 let identifyArbitrageOpportunity 
