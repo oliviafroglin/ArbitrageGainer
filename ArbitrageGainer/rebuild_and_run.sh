@@ -2,7 +2,7 @@
 
 # Define variables
 DOCKER_HUB_USERNAME="wenxiyan"
-TEAM_NUMBER="01"
+TEAM_NUMBER="team_01"
 APP_PORT=8080
 MYSQL_IMAGE_NAME="mysql_18656_${TEAM_NUMBER}"
 MYSQL_ROOT_PASSWORD="Functional!"
@@ -27,6 +27,16 @@ docker run -e "MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}" \
            --network arbitrage-net \
            -v mysql_data:/var/lib/mysql \
            -d mysql:latest
+
+# Wait for MySQL to fully start
+echo "Waiting for MySQL to start..."
+sleep 10  # Adjust this sleep time if necessary to ensure MySQL is ready
+
+# Copy the SQL dump into the MySQL container
+docker cp data.sql ${MYSQL_IMAGE_NAME}:/data.sql
+
+# Execute the SQL dump file inside the MySQL container
+docker exec -i ${MYSQL_IMAGE_NAME} sh -c 'exec mysql -uroot -p"$MYSQL_ROOT_PASSWORD" $MYSQL_DATABASE < /data.sql'
 
 # Build the Docker image for your application
 docker build -f Dockerfile --platform linux/amd64 -t ${DOCKER_HUB_USERNAME}/18656_${TEAM_NUMBER} .
