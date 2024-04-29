@@ -18,10 +18,10 @@ let identifyArbitrageOpportunity
     (maximalTotalTransactionValue: decimal)
     (maximalTradingValue: decimal)
     (accTradingValue: decimal) =
-    cache |> List.fold (fun (accTradingVal, arbOpportunity) (cryptoPair, exchangeId, otherQuote) ->
+    cache |> List.fold (fun (accTradingVal, bestOpportunity, maxProfit) (cryptoPair, exchangeId, otherQuote) ->
         // Check if it is the same crypto pair and different exchanges
         match cryptoPair = quote.CryptoPair && exchangeId <> quote.ExchangeId with
-        | false -> (accTradingVal, arbOpportunity)
+        | false -> (accTradingVal, bestOpportunity, maxProfit)
         | true ->
             // printfn "\n\n\nIdentifying arbitrage opportunity for crypto pair %s" quote.CryptoPair
             // printfn "current cache: %A" cache
@@ -54,7 +54,7 @@ let identifyArbitrageOpportunity
                 match profit >= minimalProfit, transactionValue <= maximalTotalTransactionValue, (accTradingVal + transactionValue) <= maximalTradingValue with
                 // Return the accumulated trading value and the arbitrage opportunity
                 | true, true, true ->
-                    let opportunity = {
+                    let newOpportunity = {
                         CryptoCurrencyPair = quote.CryptoPair
                         ExchangeToBuyFrom = exchangeToBuyFrom
                         BuyPrice = buyPrice
@@ -63,7 +63,13 @@ let identifyArbitrageOpportunity
                         SellPrice = sellPrice
                         SellQuantity = quantity
                     }
-                    (accTradingVal + transactionValue, Some opportunity)
-                | _ -> (accTradingVal, arbOpportunity)
-            | _ -> (accTradingVal, arbOpportunity)
-    ) (accTradingValue, None)
+                    let updatedTradingValue = accTradingVal + transactionValue
+
+                    match profit > maxProfit with
+                    | true -> (updatedTradingValue, Some newOpportunity, profit)
+                    | _ -> (updatedTradingValue, bestOpportunity, maxProfit)
+
+                | _ -> (accTradingVal, bestOpportunity, maxProfit)
+            | _ -> (accTradingVal, bestOpportunity, maxProfit)
+    ) (accTradingValue, None, 0M)
+    |> fun (finalTradingVal, finalOpportunity, _) -> (finalTradingVal, finalOpportunity)

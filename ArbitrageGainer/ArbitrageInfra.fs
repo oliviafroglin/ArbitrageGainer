@@ -102,7 +102,7 @@ let processQuotes (cache: (string * int * Quote) list) (jsonString: string) (con
 
             match opportunity with
             | Some arb ->
-                // TODO: Call Order Execution Service to execute the arbitrage opportunity
+                // Call Order Execution Service to execute the arbitrage opportunity
                 printfn "Opportunity to execute: %A" arb
                 simulateOrderExecution arb
             | None -> ()
