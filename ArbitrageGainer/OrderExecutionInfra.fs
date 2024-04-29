@@ -133,7 +133,7 @@ let updateProfitAndCheckThreshold() =
         // Notify the user if the profit threshold has been exceeded
         printfn "Threshold met or exceeded. Triggering email notification."
         let emailUser = emailAgent.PostAndReply(GetEmail)
-        notifyUser emailUser "Your Arbitrage Gainer" ("Profit threshold reached, set your new threshold at: localhost:8080/pnl/threshold, your threshold reached: " + string totalProfit)
+        notifyUser emailUser "Your Arbitrage Gainer" ("Profit threshold reached, set your new threshold at: localhost:8080/pnl/threshold, your threshold is reached and your current profit is: " + string totalProfit)
         () 
     | _ ->
         // Log the current total profit for information
