@@ -11,15 +11,6 @@ type Quote = {
     ExchangeId: int
 }
 
-// type ArbitrageOpportunity = {
-//     CryptoCurrencyPair: string
-//     ExchangeToBuyFrom: string
-//     BuyPrice: decimal
-//     BuyQuantity: decimal
-//     ExchangeToSellTo: string
-//     SellPrice: decimal
-//     SellQuantity: decimal
-// }
 type Exchange = Kraken | Bitstamp | Bitfinex | Unknown
 
 type ArbitrageOpportunity = {
@@ -96,35 +87,74 @@ type KrakenDecodeRes = {
     result: KrakenNestedRes
 }
 
-type KrakenOrder = {
-    TxId: string
+type KrakenStatusDescr = {
+    Pair: string
+    OrderType: string
+    Price: string
+    Price2: string
+    Leverage: string
+    Order: string
+    Close: string
 }
 
-type BitstampOrder = {
-    StampId: string
+type KrakenNestedStatus = {
+    Refid: string
+    Userref: int
+    Status: string
+    Reason: string option
+    Opentm: decimal
+    Closetm: decimal
+    Starttm: int
+    Expiretm: int
+    Descr: KrakenStatusDescr
+    Vol: string
+    Vol_exec: string
+    Cost: string
+    Fee: string
+    Price: string
+    Stopprice: string
+    Limitprice: string
+    Misc: string
+    Oflags: string
+    Trigger: string
+    Trades: string[]
 }
 
-type BitfinexDecodeRes = 
-    int64 * string * int * obj * (int64 * obj * int64 * string * int64 * int64 * float * float * string * obj * obj * obj * int * string * obj * obj * float * int * int * int * obj * obj * obj * int * int * obj * obj * obj * string * obj * obj * obj) array * obj * string * string
-
-type BitfinexOrder = {
-    FinexId: string
+type KrakenStatusRes = {
+    Error: string[]
+    Result: Map<string, KrakenNestedStatus>
 }
 
+type BitstampTransaction = {
+    Tid: string
+    Price: string
+    Executed: string
+    USD: string
+    Fee: string
+    Datetime: string
+    Type: int
+}
 
-type OrderResult =
-    | KrakenResult of KrakenOrder
-    | BitstampResult of BitstampOrder
-    | BitfinexResult of BitfinexOrder
+type BitstampStatusRes = {
+    Id: string
+    Datetime: string
+    OrderType: string
+    Status: string
+    Market: string
+    Transactions: BitstampTransaction[]
+    AmountRemaining: string
+    ClientOrderId: string
+}
+
+type UnifiedStatusRes =
+    | KrakenStatus of KrakenStatusRes
+    | BitstampStatus of BitstampStatusRes
+    | BitfinexStatus of decimal
 
 type ApiResponse<'T> = {
     Error: string list
     Result: 'T
 }
-
-// type Result<'TSuccess, 'TFailure> = 
-//     | Success of 'TSuccess 
-//     | Failure of 'TFailure
 
 type CompletedTransaction = {
     TransactionType: TransactionType
