@@ -264,9 +264,9 @@ let getOrderStatusBitfinex (cryptoPair: string) (orderId: string) =
             try
                 let orderStatus = JsonConvert.DeserializeObject<JArray>(responseString)
                 let orders = orderStatus.[0] :?> JArray
-                let remainingAmount = orders.[5].Value<decimal>()
+                let executedAmount = orders.[4].Value<decimal>()
 
-                return Success (BitfinexStatus remainingAmount)
+                return Success (BitfinexStatus executedAmount)
             with ex ->
                 printfn "Failed to parse Bitfinex response: %s" ex.Message
                 return Failure (sprintf "Failed to parse Bitfinex response: %s" ex.Message)
@@ -392,7 +392,7 @@ let processTransactionResponse (statusResponse: UnifiedStatusRes) (orderDetails:
                               | false -> bsStatus.AmountRemaining |> decimal
                               | true -> 0m  // Handle case where AmountRemaining is null or whitespace
                           | BitfinexStatus remainingAmt->
-                              remainingAmt
+                              orderDetails.Size - remainingAmt
                           | _ -> 0m
 
     // Insert the main transaction into the database
