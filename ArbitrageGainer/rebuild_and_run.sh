@@ -19,14 +19,17 @@ docker network inspect arbitrage-net >/dev/null 2>&1 || \
 # Remove existing MySQL container if it exists
 docker ps -aq -f name=^${MYSQL_IMAGE_NAME}$ | xargs -r docker rm -f
 
+# Remove existing application container if it exists
+docker ps -aq -f name=^18656_${TEAM_NUMBER}$ | xargs -r docker rm -f
+
 # Run MySQL container with persistent storage
 docker run -e "MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}" \
            -e "MYSQL_DATABASE=${MYSQL_DATABASE}" \
            -p 3306:3306 \
-           --name ${MYSQL_IMAGE_NAME} \
            --network arbitrage-net \
            -v mysql_data:/var/lib/mysql \
-           -d mysql:latest
+           -d mysql:latest \
+           --name ${MYSQL_IMAGE_NAME} 
 
 # Wait for MySQL to fully start
 echo "Waiting for MySQL to start..."
@@ -45,7 +48,10 @@ docker build -f Dockerfile --platform linux/amd64 -t ${DOCKER_HUB_USERNAME}/1865
 docker run -p ${APP_PORT}:${APP_PORT} \
            --network arbitrage-net \
            --link ${MYSQL_IMAGE_NAME}:mysql \
+           -v $(pwd)/historicalData.txt:/app/historicalData.txt \
+           --name 18656_${TEAM_NUMBER} \
            ${DOCKER_HUB_USERNAME}/18656_${TEAM_NUMBER}
+
 
 # Output connection information
 echo "To connect to your MySQL Server, use the following connection string in your application:"

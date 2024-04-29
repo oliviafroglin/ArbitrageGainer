@@ -1,4 +1,4 @@
-open System
+open System.Net
 open Suave
 open Suave.Filters
 open Suave.Operators
@@ -32,9 +32,16 @@ let app : WebPart =
             path "/annualized-return" >=> annualizedReturnHandler
         ]
     ]
+    
+let startWebServer() =
+    let ipAddress = IPAddress.Parse("0.0.0.0")
+    let port = Sockets.Port.Parse("8080") // Convert an int to a Port
+    let binding = HttpBinding.create HTTP ipAddress port
+    let config = { defaultConfig with bindings = [ binding ] }
+    startWebServer config app
+
 [<EntryPoint>]
 let main args  =
-
-    startWebServer defaultConfig app // start the web server
+    startWebServer()
     
     0 // return an integer exit code

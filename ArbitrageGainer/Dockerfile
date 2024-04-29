@@ -5,6 +5,7 @@ EXPOSE 8080
 WORKDIR /source
 
 COPY ./*.fsproj ./
+
 RUN dotnet restore
 
 COPY . .
