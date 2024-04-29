@@ -11,6 +11,9 @@ open System.Net.Http.Headers
 open System.Text
 open FSharp.Data
 open Newtonsoft.Json.Linq
+open ManagePnLThresholdCore
+open ManagePnLThresholdService
+open ManagePnLThresholdInfra
 
 open Suave
 open Suave.Filters
@@ -77,8 +80,7 @@ open ArbitrageModels
 //     TransactionDate: DateTime
 // }
 
-let connectionString = "Server=cmu-fp.mysql.database.azure.com;Database=team_database_schema;Uid=sqlserver;Pwd=-*lUp54$JMRku5Ay;SslMode=Required;"
-
+let connectionString = "Server=cmu-fp.mysql.database.azure.com;Database=team_database_schema;Uid=sqlserver;Password=Functional!;SslMode=Required;"
 type BitstampResponse = JsonProvider<"""{"id":"1234","market":"FET/USD","datetime":"2023-12-31 14:43:15.796000","type":"0","price":"22.45","amount":"58.06000000","client_order_id":"123456789"}""">
 //     | GetProfit of AsyncReplyChannel<decimal>
 //     | SetProfit of decimal
@@ -165,15 +167,16 @@ let notifyUser (email: string) (subject: string) (body: string) =
         printfn "Failed to send email. Error: %s" errMsg
     ()
 
-let updateProfitAndCheckThreshold  =
-    //TODO: Fetch threshold from another module
-    let ProfitThreshold : decimal option = Some 10000m
+let updateProfitAndCheckThreshold =
+        //TODO: Fetch threshold from another module
+    // let ProfitThreshold = 1000m
+    let ProfitThreshold = thresholdAgent.GetThreshold()
     // Retrieve the current total profit synchronously
     let totalProfit = profitAgent.PostAndReply(GetProfit)
     printfn "Checking threshold: Current Total Profit = %A, Threshold = %A" totalProfit ProfitThreshold
 
-    match ProfitThreshold with
-    | Some threshold when totalProfit >= threshold ->
+    match ProfitThreshold.Value with
+    | threshold when threshold <> 0M && totalProfit >= threshold ->
         let isAutoStop = autoStopAgent.PostAndReply(GetAutoStop)
         match isAutoStop with
         | true ->

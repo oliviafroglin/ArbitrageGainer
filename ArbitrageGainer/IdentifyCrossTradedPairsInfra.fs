@@ -101,8 +101,7 @@ let fetchCurrencyPairsFromKraken () =
     }
 
 // Initializes the database by creating a table to store cross-traded pairs.
-let connectionString = "Server=cmu-fp.mysql.database.azure.com;Database=team_database_schema;Uid=sqlserver;Pwd=-*lUp54$JMRku5Ay;SslMode=Required;"
-
+let connectionString = "Server=cmu-fp.mysql.database.azure.com;Database=team_database_schema;Uid=sqlserver;Password=Functional!;SslMode=Required;"
 let initializeDatabase () =
     let connection = new MySqlConnection(connectionString)
     let commandText = """

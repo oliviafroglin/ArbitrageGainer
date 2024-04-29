@@ -13,8 +13,7 @@ type DatabaseError =
     | ConnectionFailed of Exception
     | QueryFailed of Exception
 
-let connectionString = "Server=cmu-fp.mysql.database.azure.com;Database=team_database_schema;Uid=sqlserver;Pwd=-*lUp54$JMRku5Ay;SslMode=Required;"
-
+let connectionString = "Server=cmu-fp.mysql.database.azure.com;Database=team_database_schema;Uid=sqlserver;Password=Functional!;SslMode=Required;"
 // Initializes the database by creating a table to store historical spread data.
 let initializeDatabase () =
     let connection = new MySqlConnection(connectionString)
