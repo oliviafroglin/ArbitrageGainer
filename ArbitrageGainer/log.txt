@@ -73,3 +73,6 @@
 2024-04-28 18:04:54:698 - Starting Real-Time Trading called
 2024-04-28 18:06:45:743 - Starting Real-Time Trading called
 2024-04-28 19:05:26:897 - Starting Real-Time Trading called
+2024-04-28 19:11:58:455 - Starting Historical Arbitrage Analysis called
+2024-04-28 19:11:59:049 - Historical Arbitrage Analysis completed in 00:00:00.5763790 seconds called
+2024-04-28 19:13:55:696 - Starting Real-Time Trading called
