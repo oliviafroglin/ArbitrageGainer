@@ -10,12 +10,14 @@ open System
 open PnLCalculationService
 open MySql.Data.MySqlClient
 
-let connectionString = "Server=cmu-fp.mysql.database.azure.com;Database=team_database_schema;Uid=sqlserver;Pwd=-*lUp54$JMRku5Ay;SslMode=Required;"
+let connectionString = "Server=cmu-fp.mysql.database.azure.com;Database=team_database_schema;Uid=sqlserver;Password=-*lUp54$JMRku5Ay;SslMode=Required;"
+
 
 let fetchTransactionsForDay (date: DateTime) : list<CompletedTransaction> =
     try
         let startOfDay = date.Date
-        let endOfDay = date.Date.AddDays(1.0).AddTicks(-1L)
+        let now = DateTime.Now
+        let endOfDay = now.Date
 
         use connection = new MySqlConnection(connectionString)
         connection.Open()
@@ -29,6 +31,9 @@ let fetchTransactionsForDay (date: DateTime) : list<CompletedTransaction> =
         use cmd = new MySqlCommand(commandText, connection)
         cmd.Parameters.AddWithValue("@startOfDay", startOfDay)
         cmd.Parameters.AddWithValue("@endOfDay", endOfDay)
+        
+        printfn "Executing SQL: %s" commandText
+        printfn "Parameters: startOfDay = %O, endOfDay = %O" startOfDay endOfDay
 
         use reader = cmd.ExecuteReader()
 

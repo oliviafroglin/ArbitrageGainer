@@ -19,7 +19,7 @@ open System.Globalization
 open MySql.Data.MySqlClient
 open Logging.Logger
 
-let connectionString = "Server=cmu-fp.mysql.database.azure.com;Database=team_database_schema;Uid=sqlserver;Pwd=-*lUp54$JMRku5Ay;SslMode=Required;"
+let connectionString = "Server=cmu-fp.mysql.database.azure.com;Database=team_database_schema;Uid=sqlserver;Password=Functional!;SslMode=Required;"
 
 let fetchCrossAndHistPairs =
     try
@@ -92,6 +92,7 @@ let processQuotes (cache: (string * int * Quote) list) (jsonString: string) (con
     jsonStrings |> List.fold (fun (currentCache) jsonString ->
         match tryParseQuote jsonString with
         | Success quote ->
+            // printfn "\nReceived quote: %A" quote
             // retrieve the current accumulated trading value
             let currentAccVal = tradingValueAgent.PostAndReply GetTradingValue 
             // Update the market data cache with the latest quote and identify any arbitrage opportunities
@@ -105,6 +106,8 @@ let processQuotes (cache: (string * int * Quote) list) (jsonString: string) (con
                 printfn "Opportunity to execute: %A" arb
                 simulateOrderExecution arb
             | None -> ()
+
+            // printfn "\nUpdated market data cache: %A" updatedCache
             updatedCache
         | Failure errorMsg ->
             // printfn "Failed to parse quote due to error: %s" errorMsg

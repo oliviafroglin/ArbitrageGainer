@@ -56,10 +56,10 @@ let identifyArbitrageOpportunity
                 | true, true, true ->
                     let opportunity = {
                         CryptoCurrencyPair = quote.CryptoPair
-                        ExchangeToBuyFrom = convertExIdToName exchangeId
+                        ExchangeToBuyFrom = exchangeToBuyFrom
                         BuyPrice = buyPrice
                         BuyQuantity = quantity
-                        ExchangeToSellTo = convertExIdToName quote.ExchangeId
+                        ExchangeToSellTo = exchangeToSellTo
                         SellPrice = sellPrice
                         SellQuantity = quantity
                     }

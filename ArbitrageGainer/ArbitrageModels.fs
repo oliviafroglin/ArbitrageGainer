@@ -11,15 +11,6 @@ type Quote = {
     ExchangeId: int
 }
 
-// type ArbitrageOpportunity = {
-//     CryptoCurrencyPair: string
-//     ExchangeToBuyFrom: string
-//     BuyPrice: decimal
-//     BuyQuantity: decimal
-//     ExchangeToSellTo: string
-//     SellPrice: decimal
-//     SellQuantity: decimal
-// }
 type Exchange = Kraken | Bitstamp | Bitfinex | Unknown
 
 type ArbitrageOpportunity = {
@@ -82,14 +73,88 @@ type OrderResponse = {
     Remaining: decimal
 }
 
+type KrakenInnerRes = {
+    order: string
+}
+
+type KrakenNestedRes = {
+    descr: KrakenInnerRes
+    txid: string[]
+}
+
+type KrakenDecodeRes = {
+    error: string[]
+    result: KrakenNestedRes
+}
+
+type KrakenStatusDescr = {
+    Pair: string
+    OrderType: string
+    Price: string
+    Price2: string
+    Leverage: string
+    Order: string
+    Close: string
+}
+
+type KrakenNestedStatus = {
+    Refid: string
+    Userref: int
+    Status: string
+    Reason: string option
+    Opentm: decimal
+    Closetm: decimal
+    Starttm: int
+    Expiretm: int
+    Descr: KrakenStatusDescr
+    Vol: string
+    Vol_exec: string
+    Cost: string
+    Fee: string
+    Price: string
+    Stopprice: string
+    Limitprice: string
+    Misc: string
+    Oflags: string
+    Trigger: string
+    Trades: string[]
+}
+
+type KrakenStatusRes = {
+    Error: string[]
+    Result: Map<string, KrakenNestedStatus>
+}
+
+type BitstampTransaction = {
+    Tid: string
+    Price: string
+    Executed: string
+    USD: string
+    Fee: string
+    Datetime: string
+    Type: int
+}
+
+type BitstampStatusRes = {
+    Id: string
+    Datetime: string
+    OrderType: string
+    Status: string
+    Market: string
+    Transactions: BitstampTransaction[]
+    AmountRemaining: string
+    ClientOrderId: string
+}
+
+type UnifiedStatusRes =
+    | KrakenStatus of KrakenStatusRes
+    | BitstampStatus of BitstampStatusRes
+    | BitfinexStatus of decimal
+
 type ApiResponse<'T> = {
     Error: string list
     Result: 'T
 }
-
-// type Result<'TSuccess, 'TFailure> = 
-//     | Success of 'TSuccess 
-//     | Failure of 'TFailure
 
 type CompletedTransaction = {
     TransactionType: TransactionType
