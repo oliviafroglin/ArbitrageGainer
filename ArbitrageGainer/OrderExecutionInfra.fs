@@ -11,6 +11,9 @@ open System.Net.Http.Headers
 open System.Text
 open FSharp.Data
 open Newtonsoft.Json.Linq
+open ManagePnLThresholdCore
+open ManagePnLThresholdService
+open ManagePnLThresholdInfra
 
 open Suave
 open Suave.Filters
@@ -164,15 +167,16 @@ let notifyUser (email: string) (subject: string) (body: string) =
         printfn "Failed to send email. Error: %s" errMsg
     ()
 
-let updateProfitAndCheckThreshold  =
-    //TODO: Fetch threshold from another module
-    let ProfitThreshold : decimal option = Some 10000m
+let updateProfitAndCheckThreshold =
+        //TODO: Fetch threshold from another module
+    // let ProfitThreshold = 1000m
+    let ProfitThreshold = thresholdAgent.GetThreshold()
     // Retrieve the current total profit synchronously
     let totalProfit = profitAgent.PostAndReply(GetProfit)
     printfn "Checking threshold: Current Total Profit = %A, Threshold = %A" totalProfit ProfitThreshold
 
-    match ProfitThreshold with
-    | Some threshold when totalProfit >= threshold ->
+    match ProfitThreshold.Value with
+    | threshold when threshold <> 0M && totalProfit >= threshold ->
         let isAutoStop = autoStopAgent.PostAndReply(GetAutoStop)
         match isAutoStop with
         | true ->
