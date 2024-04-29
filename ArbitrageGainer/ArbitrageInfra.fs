@@ -19,7 +19,7 @@ open System.Globalization
 open MySql.Data.MySqlClient
 open Logging.Logger
 
-let connectionString = "Server=cmu-fp.mysql.database.azure.com;Database=team_database_schema;Uid=sqlserver;Pwd=-*lUp54$JMRku5Ay;SslMode=Required;"
+let connectionString = "Server=cmu-fp.mysql.database.azure.com;Database=team_database_schema;Uid=sqlserver;Password=Functional!;SslMode=Required;"
 
 let fetchCrossAndHistPairs =
     try
@@ -72,23 +72,6 @@ let fetchCrossAndHistPairs =
         printfn "Database error: %s" ex.Message
         ([], [])
 
-// A mailbox processor for the configuration agent
-let configAgent = MailboxProcessor.Start(fun inbox ->
-    let rec loop (numSubscriptions, minSpread, minProfit, maxTransactionValue, maxTradingValue) =
-        async {
-            let! message = inbox.Receive()
-            match message with
-            // Update the configuration with the new values
-            | UpdateConfig (newNumSubscriptions, newMinSpread, newMinProfit, newMaxTransactionValue, newMaxTradingValue) ->
-                return! loop (newNumSubscriptions, newMinSpread, newMinProfit, newMaxTransactionValue, newMaxTradingValue)
-            // Get the current configuration values
-            | GetConfig reply ->
-                reply.Reply (numSubscriptions, minSpread, minProfit, maxTransactionValue, maxTradingValue)
-                return! loop (numSubscriptions, minSpread, minProfit, maxTransactionValue, maxTradingValue)
-        }
-    // Start the loop with the initial configuration values
-    loop (0, 0M, 0M, 0M, 0M))
-
 //Define a function to connect to the WebSocket
 let connectToWebSocket (uri: Uri) =
         async {
@@ -109,6 +92,7 @@ let processQuotes (cache: (string * int * Quote) list) (jsonString: string) (con
     jsonStrings |> List.fold (fun (currentCache) jsonString ->
         match tryParseQuote jsonString with
         | Success quote ->
+            // printfn "\nReceived quote: %A" quote
             // retrieve the current accumulated trading value
             let currentAccVal = tradingValueAgent.PostAndReply GetTradingValue 
             // Update the market data cache with the latest quote and identify any arbitrage opportunities
@@ -118,10 +102,12 @@ let processQuotes (cache: (string * int * Quote) list) (jsonString: string) (con
 
             match opportunity with
             | Some arb ->
-                // TODO: Call Order Execution Service to execute the arbitrage opportunity
+                // Call Order Execution Service to execute the arbitrage opportunity
                 printfn "Opportunity to execute: %A" arb
                 simulateOrderExecution arb
             | None -> ()
+
+            // printfn "\nUpdated market data cache: %A" updatedCache
             updatedCache
         | Failure errorMsg ->
             // printfn "Failed to parse quote due to error: %s" errorMsg
