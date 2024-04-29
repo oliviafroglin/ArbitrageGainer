@@ -175,3 +175,11 @@ type EmailMessage =
 type AutoStopMessage =
     | GetAutoStop of AsyncReplyChannel<bool>
     | SetAutoStop of bool
+
+type TimeStampMessage =
+    | GetStartTime of AsyncReplyChannel<DateTime>
+    | GetEndTime of AsyncReplyChannel<DateTime>
+    | GetTimeDiff of AsyncReplyChannel<TimeSpan>
+    | GetLogged of AsyncReplyChannel<bool>
+    | UpdateStartTime of DateTime
+    | UpdateEndTime of DateTime

@@ -23,67 +23,14 @@ open Suave.RequestErrors
 
 open ArbitrageService
 open ArbitrageModels
+open TimeStamps
+open Logging.Logger
 // open ManagePnLThresholdInfra
 // open PnLCalculationCore
 // open PnLCalculationService
-// run this file separately for this milestone! 
-
-// type Exchange = Kraken | Bitstamp | Bitfinex
-// type CryptoCurrencyPair = string
-
-// type UserDefinedParameters = {
-//     ProfitThreshold: decimal option
-// }
-
-// type ArbitrageOpportunity = {
-//     CryptoCurrencyPair: string
-//     ExchangeToBuyFrom: Exchange
-//     ExchangeToSellTo: Exchange
-//     BuyPrice: decimal
-//     BuyQuantity: decimal
-//     SellPrice: decimal
-//     SellQuantity: decimal
-// }
-// type TransactionType = Buy | Sell
-
-// type OrderDetails = {
-//     Pair: string
-//     Size: decimal
-//     Price: decimal
-//     OrderType: TransactionType  // Buy or Sell
-// }
-// type OrderResponse = {
-//     Id: string
-//     Market: string
-//     DateTime: string
-//     Type: string
-//     Price: decimal
-//     Amount: decimal
-//     ClientOrderId: string
-//     Status: string
-//     Remaining: decimal
-// }
-
-// type ApiResponse<'T> = {
-//     Error: string list
-//     Result: 'T
-// }
-
-// type Result<'TSuccess, 'TFailure> = 
-//     | Success of 'TSuccess 
-//     | Failure of 'TFailure
-
-// type CompletedTransaction = {
-//     TransactionType: TransactionType
-//     Price: decimal
-//     Amount: decimal
-//     TransactionDate: DateTime
-// }
 
 let connectionString = "Server=cmu-fp.mysql.database.azure.com;Database=team_database_schema;Uid=sqlserver;Password=Functional!;SslMode=Required;"
 type BitstampResponse = JsonProvider<"""{"id":"1234","market":"FET/USD","datetime":"2023-12-31 14:43:15.796000","type":"0","price":"22.45","amount":"58.06000000","client_order_id":"123456789"}""">
-//     | GetProfit of AsyncReplyChannel<decimal>
-//     | SetProfit of decimal
 
 let profitAgent = MailboxProcessor.Start(fun inbox ->
     let rec loop totalProfit =
@@ -446,6 +393,14 @@ let executeTransaction (direction: TransactionType) (opportunity: ArbitrageOppor
         let exchange = if direction = Buy then opportunity.ExchangeToBuyFrom else opportunity.ExchangeToSellTo
         let orderDetails = convertToOrderDetails opportunity (direction = Buy) remainingAmount
         
+        timeAgent.Post(UpdateEndTime DateTime.UtcNow)
+        match timeAgent.PostAndReply(GetLogged) with
+        | false ->
+            let timeDiff = timeAgent.PostAndReply(GetTimeDiff)
+            let logger = createLogger
+            logger (sprintf "First order placement completed in %A seconds" (timeDiff))
+        | true -> ()
+
         let! apiResponse =
             match exchange with
             | Kraken -> submitOrderInKraken orderDetails
