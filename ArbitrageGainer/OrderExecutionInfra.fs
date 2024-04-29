@@ -114,7 +114,7 @@ let notifyUser (email: string) (subject: string) (body: string) =
         printfn "Failed to send email. Error: %s" errMsg
     ()
 
-let updateProfitAndCheckThreshold =
+let updateProfitAndCheckThreshold() =
         //TODO: Fetch threshold from another module
     // let ProfitThreshold = 1000m
     let ProfitThreshold = thresholdAgent.GetThreshold()
@@ -471,7 +471,7 @@ let simulateOrderExecution (opportunity: ArbitrageOpportunity) =
     executeTransaction Sell opportunity opportunity.SellQuantity |> Async.RunSynchronously
 
     // After processing both transactions, check if the total profit meets the threshold.
-    updateProfitAndCheckThreshold
+    updateProfitAndCheckThreshold()
 
 
 let updateEmail (ctx: HttpContext): Async<HttpContext option> =
