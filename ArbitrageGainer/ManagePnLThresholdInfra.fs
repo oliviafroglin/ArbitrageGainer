@@ -36,11 +36,11 @@ let updateThresholdHandler (ctx: HttpContext) : Async<HttpContext option> =
     }
     
 
-let getThreshold(ctx: HttpContext) : Async<HttpContext option> =
-    async {
-        let! threshold = thresholdAgent.GetThreshold()
-        return! OK (threshold.ToString()) ctx
-    }
+// let getThreshold(ctx: HttpContext) : Async<HttpContext option> =
+//     async {
+//         let! threshold = thresholdAgent.GetThreshold()
+//         return! OK (threshold.ToString()) ctx
+//     }
 
 
 

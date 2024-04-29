@@ -9,6 +9,7 @@
   <ItemGroup>
     <Compile Include="Logger.fs" />
     <Compile Include="ArbitrageModels.fs" />
+    <Compile Include="TimeStamps.fs" />
     <Compile Include="PnLCalculationCore.fs" />
     <Compile Include="PnLCalculationService.fs" />
     <Compile Include="PnLCalculationInfra.fs" />
