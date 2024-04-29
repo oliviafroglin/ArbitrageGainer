@@ -13,7 +13,7 @@ type DatabaseError =
     | ConnectionFailed of Exception
     | QueryFailed of Exception
 
-let connectionString = "Server=cmu-fp.mysql.database.azure.com;Database=team_database_schema;Uid=sqlserver;Password=Functional!;SslMode=Required;"
+let connectionString = "Server=mysql_18656_team_01;Database=team_database_schema;Uid=root;Password=Functional!;SslMode=Required;"
 
 // Initializes the database by creating a table to store historical spread data.
 let initializeDatabase () =
@@ -72,7 +72,7 @@ let getHistoricalSpread () =
     logger "Starting Historical Arbitrage Analysis"
     let startTime = DateTime.Now
 
-    let filePath = "../historicalData.txt"
+    let filePath = "./historicalData.txt"
     let marketData = readMarketDataFromFile filePath
     let opportunities = identifyArbitrageOpportunities marketData
 

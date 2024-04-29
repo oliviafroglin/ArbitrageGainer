@@ -10,7 +10,8 @@ open System
 open PnLCalculationService
 open MySql.Data.MySqlClient
 
-let connectionString = "Server=cmu-fp.mysql.database.azure.com;Database=team_database_schema;Uid=sqlserver;Password=Functional!;SslMode=Required;"
+let connectionString = "Server=mysql_18656_team_01;Database=team_database_schema;Uid=root;Password=Functional!;SslMode=Required;"
+
 let fetchTransactionsForDay (date: DateTime) : list<CompletedTransaction> =
     try
         let startOfDay = date.Date
@@ -22,7 +23,7 @@ let fetchTransactionsForDay (date: DateTime) : list<CompletedTransaction> =
 
         let commandText = """
             SELECT TransactionType, Price, Amount, TransactionDate
-            FROM Transactions
+            FROM transactions
             WHERE TransactionDate BETWEEN @startOfDay AND @endOfDay;
             """
         

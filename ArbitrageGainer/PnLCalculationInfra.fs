@@ -13,7 +13,7 @@ open PnLCalculationCore
 open PnLCalculationService
 open MySql.Data.MySqlClient
 
-let connectionString = "Server=cmu-fp.mysql.database.azure.com;Database=team_database_schema;Uid=sqlserver;Password=Functional!;SslMode=Required;"
+let connectionString = "Server=mysql_18656_team_01;Database=team_database_schema;Uid=root;Password=Functional!;SslMode=Required;"
 let fetchTransactions startDate endDate =
     try
         use connection = new MySqlConnection(connectionString)
@@ -21,7 +21,7 @@ let fetchTransactions startDate endDate =
 
         let commandText = sprintf """
             SELECT TransactionType, Price, Amount, TransactionDate
-            FROM Transactions
+            FROM transactions
             WHERE TransactionDate >= @startDate AND TransactionDate <= @endDate;
             """
         

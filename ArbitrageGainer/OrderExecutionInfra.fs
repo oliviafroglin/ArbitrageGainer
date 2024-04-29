@@ -29,7 +29,7 @@ open Logging.Logger
 // open PnLCalculationCore
 // open PnLCalculationService
 
-let connectionString = "Server=cmu-fp.mysql.database.azure.com;Database=team_database_schema;Uid=sqlserver;Password=Functional!;SslMode=Required;"
+let connectionString = "Server=mysql_18656_team_01;Database=team_database_schema;Uid=root;Password=Functional!;SslMode=Required;"
 type BitstampResponse = JsonProvider<"""{"id":"1234","market":"FET/USD","datetime":"2023-12-31 14:43:15.796000","type":"0","price":"22.45","amount":"58.06000000","client_order_id":"123456789"}""">
 
 let profitAgent = MailboxProcessor.Start(fun inbox ->
@@ -144,7 +144,7 @@ let insertCompletedTransaction (transaction: CompletedTransaction) =
     try
         using (new MySqlConnection(connectionString)) <| fun connection ->
             connection.Open()
-            let sql = "INSERT INTO Transactions (TransactionType, Price, Amount, TransactionDate) VALUES (@TransactionType, @Price, @Amount, @TransactionDate)"
+            let sql = "INSERT INTO transactions (TransactionType, Price, Amount, TransactionDate) VALUES (@TransactionType, @Price, @Amount, @TransactionDate)"
             using (new MySqlCommand(sql, connection)) <| fun command ->
                 command.Parameters.AddWithValue("@TransactionType", match transaction.TransactionType with | Buy -> "Buy" | Sell -> "Sell")
                 command.Parameters.AddWithValue("@Price", transaction.Price)
