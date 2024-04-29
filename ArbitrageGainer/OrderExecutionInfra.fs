@@ -182,7 +182,7 @@ let updateProfitAndCheckThreshold  =
         // Notify the user if the profit threshold has been exceeded
         printfn "Threshold met or exceeded. Triggering email notification."
         let emailUser = emailAgent.PostAndReply(GetEmail)
-        notifyUser emailUser "Your Arbitrage Gainer" ("Profit threshold reached: " + string totalProfit)
+        notifyUser emailUser "Your Arbitrage Gainer" ("Profit threshold reached, set your new threshold at: localhost:8080/pnl/threshold, your threshold reached: " + string totalProfit)
         () 
     | _ ->
         // Log the current total profit for information
@@ -216,7 +216,8 @@ let getOrderStatusBitstamp (orderId: string) =
         let content = new StringContent(requestBody, Encoding.UTF8, "application/x-www-form-urlencoded")
         
         let! response = client.PostAsync(uri, content) |> Async.AwaitTask
-        if response.IsSuccessStatusCode then
+        match response.IsSuccessStatusCode with
+        | true ->
             let! responseString = response.Content.ReadAsStringAsync() |> Async.AwaitTask
             try
                 let orderStatus = JsonConvert.DeserializeObject<BitstampStatusRes>(responseString)
@@ -224,10 +225,11 @@ let getOrderStatusBitstamp (orderId: string) =
             with ex ->
                 printfn "Failed to retrieve order status: %s" ex.Message
                 return Failure (sprintf "Failed to retrieve order status: %s" ex.Message)
-        else
+        | false ->
             printfn "Failed to retrieve order status: %s" response.ReasonPhrase
             return Failure response.ReasonPhrase
     }
+
 
 let getOrderStatusKraken (orderId: string) =
     async {
@@ -237,7 +239,8 @@ let getOrderStatusKraken (orderId: string) =
         let content = new StringContent(requestBody, Encoding.UTF8, "application/x-www-form-urlencoded")
 
         let! response = client.PostAsync(uri, content) |> Async.AwaitTask
-        if response.IsSuccessStatusCode then
+        match response.IsSuccessStatusCode with
+        | true ->
             let! responseString = response.Content.ReadAsStringAsync() |> Async.AwaitTask
             try
                 let orderStatus = JsonConvert.DeserializeObject<KrakenStatusRes>(responseString)
@@ -245,7 +248,7 @@ let getOrderStatusKraken (orderId: string) =
             with ex ->
                 printfn "Failed to retrieve Kraken order status: %s" ex.Message
                 return Failure (sprintf "Failed to retrieve Kraken order status: %s" ex.Message)
-        else
+        | false ->
             printfn "Failed to retrieve Kraken order status: %s" response.ReasonPhrase
             return Failure response.ReasonPhrase
     }
@@ -258,7 +261,8 @@ let getOrderStatusBitfinex (cryptoPair: string) (orderId: string) =
         let content = new StringContent(requestBody, Encoding.UTF8, "application/x-www-form-urlencoded")
 
         let! response = client.PostAsync(uri, content) |> Async.AwaitTask
-        if response.IsSuccessStatusCode then
+        match response.IsSuccessStatusCode with
+        | true ->
             let! responseString = response.Content.ReadAsStringAsync() |> Async.AwaitTask
             
             try
@@ -270,7 +274,7 @@ let getOrderStatusBitfinex (cryptoPair: string) (orderId: string) =
             with ex ->
                 printfn "Failed to parse Bitfinex response: %s" ex.Message
                 return Failure (sprintf "Failed to parse Bitfinex response: %s" ex.Message)
-        else
+        | false ->
             printfn "Failed to retrieve Bitfinex order status: %s" response.ReasonPhrase
             return Failure response.ReasonPhrase
     }
@@ -282,13 +286,19 @@ let submitOrderInBitstamp (order: OrderDetails) =
         client.DefaultRequestHeaders.Accept.Add(MediaTypeWithQualityHeaderValue("application/x-www-form-urlencoded"))
         
         let normalizedPair = order.Pair.Replace("-", "").ToLower()
-        let uri = sprintf "https://18656-testing-server.azurewebsites.net/order/place/api/v2/%s/market/%s/" (if order.OrderType = Buy then "buy" else "sell") normalizedPair
+        let orderType = 
+            match order.OrderType with
+            | Buy -> "buy"
+            | Sell -> "sell"
+
+        let uri = sprintf "https://18656-testing-server.azurewebsites.net/order/place/api/v2/%s/market/%s/" orderType normalizedPair
         let body = sprintf "amount=%f&price=%f" order.Size order.Price
         let content = new StringContent(body, Encoding.UTF8, "application/x-www-form-urlencoded")
         
         printfn "Sending request to Bitstamp with data: %s" body
         let! response = client.PostAsync(uri, content) |> Async.AwaitTask
-        if response.IsSuccessStatusCode then
+        match response.IsSuccessStatusCode with
+        | true ->
             let! responseString = response.Content.ReadAsStringAsync() |> Async.AwaitTask
             try
                 let orderResponse = BitstampResponse.Parse(responseString)
@@ -296,11 +306,10 @@ let submitOrderInBitstamp (order: OrderDetails) =
             with ex ->
                 printfn "Failed to deserialize JSON response: %s" ex.Message
                 return Failure (sprintf "Failed to deserialize JSON response: %s" ex.Message)
-        else
+        | false ->
             printfn "Failed to place order on Bitstamp: %s" response.ReasonPhrase
             return Failure response.ReasonPhrase
     }
-
 
 let submitOrderInKraken (order: OrderDetails) =
     async {
@@ -309,12 +318,18 @@ let submitOrderInKraken (order: OrderDetails) =
         
         let uri = "https://18656-testing-server.azurewebsites.net/order/place/0/private/AddOrder"
         let pair = "XX" + order.Pair.Replace("-", "")
-        let body = sprintf "nonce=%s&ordertype=market&type=%s&volume=%s&pair=%s&price=%s" "1" (if order.OrderType = Buy then "buy" else "sell") (string order.Size) pair (string order.Price)
+        let orderType = 
+            match order.OrderType with
+            | Buy -> "buy"
+            | Sell -> "sell"
+
+        let body = sprintf "nonce=%s&ordertype=market&type=%s&volume=%s&pair=%s&price=%s" "1" orderType (string order.Size) pair (string order.Price)
         let content = new StringContent(body, Encoding.UTF8, "application/x-www-form-urlencoded")
         
         printfn "Sending request to Kraken with data: %s" body
         let! response = client.PostAsync(uri, content) |> Async.AwaitTask
-        if response.IsSuccessStatusCode then
+        match response.IsSuccessStatusCode with
+        | true ->
             let! responseString = response.Content.ReadAsStringAsync() |> Async.AwaitTask
             try
                 let orderResponse = JsonConvert.DeserializeObject<KrakenDecodeRes>(responseString)
@@ -326,10 +341,11 @@ let submitOrderInKraken (order: OrderDetails) =
             with ex ->
                 printfn "Failed to deserialize JSON response: %s" ex.Message
                 return Failure (sprintf "Failed to deserialize JSON response: %s" ex.Message)
-        else
+        | false ->
             printfn "Failed to place order on Kraken: %s" response.ReasonPhrase
             return Failure response.ReasonPhrase
     }
+
 
 let tryExtractOrderId (json: JArray) =
     try
@@ -354,7 +370,8 @@ let submitOrderInBitfinex (order: OrderDetails) =
 
         printfn "Sending request to Bitfinex with data: %s" requestBody
         let! response = client.PostAsync(uri, content) |> Async.AwaitTask
-        if response.IsSuccessStatusCode then
+        match response.IsSuccessStatusCode with
+        | true ->
             let! responseString = response.Content.ReadAsStringAsync() |> Async.AwaitTask
             try
                 let parsedJson = JsonConvert.DeserializeObject<JArray>(responseString)
@@ -367,7 +384,7 @@ let submitOrderInBitfinex (order: OrderDetails) =
             with ex ->
                 printfn "Failed to deserialize JSON response: %s" ex.Message
                 return Failure (sprintf "Failed to deserialize JSON response: %s" ex.Message)
-        else
+        | false ->
             printfn "Failed to place order on Bitfinex: %s" response.ReasonPhrase
             return Failure response.ReasonPhrase
     }
@@ -376,10 +393,13 @@ let convertToOrderDetails (opportunity: ArbitrageOpportunity) (isBuy: bool) (rem
     {
         Pair = opportunity.CryptoCurrencyPair
         Size = remainingAmount
-        Price = if isBuy then opportunity.BuyPrice else opportunity.SellPrice
-        OrderType = if isBuy then Buy else Sell
+        Price = match isBuy with
+                | true -> opportunity.BuyPrice
+                | false -> opportunity.SellPrice
+        OrderType = match isBuy with
+                    | true -> Buy
+                    | false -> Sell
     }
-
 let processTransactionResponse (statusResponse: UnifiedStatusRes) (orderDetails: OrderDetails) (Exchange: Exchange): unit =
     // Determine the remaining amount based on the status response
     let remainingAmount = match statusResponse with
@@ -405,7 +425,8 @@ let processTransactionResponse (statusResponse: UnifiedStatusRes) (orderDetails:
     insertCompletedTransaction completedTransaction
 
     // If there is any remaining amount, place another order for that amount
-    if remainingAmount > 0m then
+    match remainingAmount > 0m with
+    | true ->
         let remainingOrderDetails = { orderDetails with Size = remainingAmount }
         Async.RunSynchronously (
             match Exchange with
@@ -426,6 +447,7 @@ let processTransactionResponse (statusResponse: UnifiedStatusRes) (orderDetails:
             TransactionDate = DateTime.UtcNow
         }
         insertCompletedTransaction remainingTransaction
+    | false -> ()  // No action needed if no remaining amount
 
     let priceImpact = orderDetails.Size * orderDetails.Price
     let profitUpdate = match orderDetails.OrderType with
@@ -439,7 +461,10 @@ let processTransactionResponse (statusResponse: UnifiedStatusRes) (orderDetails:
 // Function to execute a transaction and handle the response.
 let executeTransaction (direction: TransactionType) (opportunity: ArbitrageOpportunity) (remainingAmount: decimal) : Async<unit> =
     async {
-        let exchange = if direction = Buy then opportunity.ExchangeToBuyFrom else opportunity.ExchangeToSellTo
+        let exchange = 
+            match direction with
+            | Buy -> opportunity.ExchangeToBuyFrom
+            | Sell -> opportunity.ExchangeToSellTo
         let orderDetails = convertToOrderDetails opportunity (direction = Buy) remainingAmount
         
         let! apiResponse =
