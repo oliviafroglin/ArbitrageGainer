@@ -40,7 +40,7 @@ sleep 10  # Adjust this sleep time if necessary to ensure MySQL is ready
 # docker cp data.sql ${MYSQL_IMAGE_NAME}:/data.sql
 
 # Execute the SQL dump file inside the MySQL container
-docker exec -i ${MYSQL_IMAGE_NAME} sh -c 'exec mysql -uroot -p"$MYSQL_ROOT_PASSWORD" $MYSQL_DATABASE < /data.sql'
+# docker exec -i ${MYSQL_IMAGE_NAME} sh -c 'exec mysql -uroot -p"$MYSQL_ROOT_PASSWORD" $MYSQL_DATABASE < /data.sql'
 
 # Build the Docker image for your application
 docker build -f Dockerfile --platform linux/amd64 -t ${DOCKER_HUB_USERNAME}/18656_${TEAM_NUMBER} .
