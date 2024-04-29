@@ -15,6 +15,7 @@ open FSharp.Data
 open ArbitrageService
 open OrderExecutionInfra
 open ArbitrageModels
+open TimeStamps
 open System.Globalization
 open MySql.Data.MySqlClient
 open Logging.Logger
@@ -231,6 +232,7 @@ let updateConfig (ctx : HttpContext) : Async<HttpContext option> =
 let startTrading (ctx : HttpContext) : Async<HttpContext option> =
     let logger = createLogger
     logger "Starting Real-Time Trading"
+    timeAgent.Post (UpdateStartTime DateTime.Now)
     let isTradingActive = tradingAgent.PostAndReply (CheckStatus)
     match isTradingActive with
     // Start trading if it is not already active
