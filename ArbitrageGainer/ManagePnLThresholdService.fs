@@ -33,5 +33,12 @@ type PnLThresholdAgent() =
         agent.PostAndAsyncReply(fun replyChannel -> SetThreshold (threshold, replyChannel))
 
 
-    member this.GetThreshold() =
-        agent.PostAndAsyncReply(fun replyChannel -> GetThreshold(replyChannel))
+    // member this.GetThreshold() =
+    //     agent.PostAndAsyncReply(fun replyChannel -> GetThreshold(replyChannel))
+    member this.GetThreshold() : PnLThreshold =
+        let result = agent.PostAndAsyncReply(fun replyChannel -> GetThreshold(replyChannel))
+        let finalResult = Async.RunSynchronously(result)
+        match finalResult with
+        | Ok value -> { Value = value }
+        | Error _ -> { Value = 0M }
+
