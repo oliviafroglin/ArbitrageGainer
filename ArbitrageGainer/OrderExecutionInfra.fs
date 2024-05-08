@@ -87,8 +87,6 @@ let autoStopAgent = MailboxProcessor.Start(fun inbox ->
 // profitAgent.Post(SetProfit 1000m)
 // let profit = profitAgent.PostAndReply(GetProfit)
 let sendEmail (toAddress: string) (subject: string) (body: string) : Result<unit, string> =
-    let fromAddress = "oliviaxjlin@gmail.com"
-    let fromPassword = "glulmzsxusizlpja"
     let smtpHost = "smtp.gmail.com"
     let smtpPort = 587
     let message = new MailMessage(fromAddress, toAddress, subject, body)
@@ -314,7 +312,6 @@ let submitOrderInBitfinex (order: OrderDetails) =
         use client = new HttpClient()
         client.DefaultRequestHeaders.Accept.Add(MediaTypeWithQualityHeaderValue("application/json"))
         
-        let uri = "https://18656-testing-server.azurewebsites.net/order/place/v2/auth/w/order/submit"
         let pair = "t" + order.Pair.Replace("-", "")
         let requestBody = sprintf "type=%s&symbol=%s&amount=%s&price=%s" "MARKET" pair (string order.Size) (string order.Price)
         let content = new StringContent(requestBody, Encoding.UTF8, "application/x-www-form-urlencoded")
