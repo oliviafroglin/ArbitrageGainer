@@ -1,5 +1,14 @@
 ## Link to repo: https://github.com/oliviafroglin/FunctionalProgramming/tree/main
 
+We call it ArbitrageGainer and the goal is to seize “arbitrage” opportunities which present
+themselves when there exists a price difference in cryptocurrencies on various cryptocurrency
+exchanges e.g Kraken and Bitstamp. Whenever a given cryptocurrency is available at a lower price
+on a certain exchange and at a higher price on the other, the application initiates an order to
+purchase on the low-priced exchange and an order to sell on the high-priced exchange. Like in
+real-world trading, both orders need to be matched with a seller/buyer on the respective stock
+exchanges. As markets move swiftly this is not guaranteed to happen hence every arbitrage
+transaction has inherent risk to it.  This is writte in F# and follows the rules of functional progarmming.
+
 ## 1. Workflows
 1. Historical spread calculation algorithm
 
