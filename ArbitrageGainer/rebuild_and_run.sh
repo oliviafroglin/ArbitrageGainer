@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Define variables
-DOCKER_HUB_USERNAME="wenxiyan"
+DOCKER_HUB_USERNAME="xx"
 TEAM_NUMBER="team_01"
 APP_PORT=8080
 MYSQL_IMAGE_NAME="mysql_18656_${TEAM_NUMBER}"
